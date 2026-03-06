@@ -3,450 +3,974 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Polymarket Crypto Leaderboard — Win Rates</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+    <title>Polymarket Win Rate Leaderboard — POLYSAUCE</title>
+    <meta name="description" content="Top Polymarket traders ranked by win rate. Crypto markets only. Updated daily.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
         :root {
-            --bg: #0a0a0b;
-            --bg-card: #111113;
-            --bg-row: #18181b;
-            --text: #fafafa;
-            --text-muted: #71717a;
-            --text-dim: #52525b;
-            --accent: #8b5cf6;
-            --green: #22c55e;
-            --red: #ef4444;
-            --border: #27272a;
+            --bg:        #070706;
+            --bg-card:   #0f0f0e;
+            --bg-raised: #161614;
+            --lime:      #c8f03d;
+            --lime-dim:  #8aaa28;
+            --orange:    #ff5c1a;
+            --green:     #00e878;
+            --red:       #ff3352;
+            --yellow:    #fbbf24;
+            --text:      #e8e8de;
+            --muted:     #6a6a5e;
+            --dim:       #3a3a30;
+            --border:    #1e1e1a;
+            --border-hi: #2e2e28;
         }
-        
+
+        html { scroll-behavior: smooth; }
+
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg);
+            font-family: 'IBM Plex Mono', monospace;
+            background-color: var(--bg);
             color: var(--text);
+            line-height: 1.6;
             min-height: 100vh;
-            padding: 24px;
+            position: relative;
         }
-        
-        .container { max-width: 900px; margin: 0 auto; }
-        
-        header { text-align: center; margin-bottom: 40px; padding: 32px 0; }
-        
-        h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2rem;
-            margin-bottom: 12px;
+
+        /* Noise */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.4;
         }
-        
-        .subtitle { color: var(--text-muted); font-size: 1rem; }
-        
-        .updated { color: var(--text-dim); font-size: 0.8rem; margin-top: 8px; }
-        
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin: 32px 0;
-            padding: 24px;
-            background: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid var(--border);
+
+        /* Scanlines */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg, transparent, transparent 2px,
+                rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px
+            );
+            pointer-events: none;
+            z-index: 9998;
         }
-        
-        .stat { text-align: center; }
-        
-        .stat-value {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--accent);
-        }
-        
-        .stat-label { color: var(--text-muted); font-size: 0.8rem; margin-top: 4px; }
-        
-        .table-container{
-            background: var(--bg-card);
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-        
-        table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
-        
-        thead { background: var(--bg); }
-        
-        th {
-            padding: 16px 12px;
-            text-align: left;
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+
+        /* ─── NAV ─── */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(7,7,6,0.92);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
         }
-        
-        td { padding: 14px 12px; border-bottom: 1px solid var(--border); }
-        tr:last-child td { border-bottom: none; }
-        
-        .rank { font-weight: 600; color: var(--text-muted); min-width: 40px; }
-        .rank-1 { color: #fbbf24; }
-        .rank-2 { color: #9ca3af; }
-        .rank-3 { color: #cd7f32; }
-        
-        .trader { display: flex; align-items: center; gap: 10px; }
-        
-        .avatar {
-            width: 28px;
-            height: 28px;
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+        }
+
+        .back-link {
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+        }
+
+        .back-link::before { content: '←'; color: var(--lime); }
+        .back-link:hover { color: var(--text); }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 0.1em;
+            color: var(--lime);
+            text-decoration: none;
+        }
+
+        .logo span { color: var(--orange); }
+
+        .btn-primary {
+            display: inline-block;
+            background: var(--lime);
+            color: var(--bg);
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 9px 20px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+        }
+
+        .btn-primary:hover {
+            background: #d9ff55;
+            box-shadow: 0 0 20px rgba(200,240,61,0.3);
+        }
+
+        /* ─── HEADER ─── */
+        .page-header {
+            padding: 48px 0 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-header-inner {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 32px;
+            align-items: end;
+        }
+
+        .terminal-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--lime-dim);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-label::before { content: '>'; color: var(--lime); }
+
+        .page-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            letter-spacing: 0.03em;
+            line-height: 0.95;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+
+        .page-title span { color: var(--lime); }
+
+        .page-subtitle {
+            font-size: 0.75rem;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--green);
+            white-space: nowrap;
+            align-self: flex-end;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent) 0%, #a855f7 100%);
+            background: var(--green);
+            animation: pulse 1.8s ease-in-out infinite;
+            box-shadow: 0 0 6px var(--green);
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 4px var(--green); }
+            50% { box-shadow: 0 0 12px var(--green); }
+        }
+
+        /* ─── STATS BAR ─── */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            margin: 32px 0;
+        }
+
+        .stats-bar-item {
+            padding: 20px 24px;
+            border-right: 1px solid var(--border);
+        }
+
+        .stats-bar-item:last-child { border-right: none; }
+
+        .sb-val {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 0.03em;
+            line-height: 1;
+            color: var(--lime);
+            margin-bottom: 4px;
+        }
+
+        .sb-val.green { color: var(--green); }
+
+        .sb-lbl {
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        /* ─── FILTERS ─── */
+        .filters {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0;
+            padding: 12px 20px;
+            background: var(--bg-raised);
+            border: 1px solid var(--border);
+            border-bottom: none;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .filter-tab {
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: 5px 12px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            background: none;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .filter-tab:hover { color: var(--text); border-color: var(--border-hi); }
+        .filter-tab.active { color: var(--lime); border-color: var(--lime); background: rgba(200,240,61,0.06); }
+
+        .filter-meta {
+            font-size: 0.6rem;
+            letter-spacing: 0.08em;
+            color: var(--dim);
+        }
+
+        /* ─── TABLE ─── */
+        .table-wrap {
+            border: 1px solid var(--border);
+            overflow: hidden;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        thead {
+            background: var(--bg-card);
+            position: sticky;
+            top: 54px;
+            z-index: 10;
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 0.6rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 500;
+            border-bottom: 1px solid var(--border-hi);
+        }
+
+        th.sortable { cursor: pointer; }
+        th.sortable:hover { color: var(--text); }
+        th.sort-active { color: var(--lime); }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: rgba(200,240,61,0.025); }
+
+        /* Row types */
+        .row-gold td:first-child { border-left: 2px solid #f5c842; }
+        .row-silver td:first-child { border-left: 2px solid #9ca3af; }
+        .row-bronze td:first-child { border-left: 2px solid #c87432; }
+        .row-locked { opacity: 0.6; }
+
+        /* Cells */
+        .cell-rank {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--dim);
+            min-width: 32px;
+        }
+
+        .row-gold .cell-rank { color: #f5c842; }
+        .row-silver .cell-rank { color: #9ca3af; }
+        .row-bronze .cell-rank { color: #c87432; }
+
+        .cell-addr {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .cell-addr.locked {
+            filter: blur(5px);
+            user-select: none;
+            color: var(--dim);
+        }
+
+        .lock-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.65rem;
+            color: var(--orange);
+            letter-spacing: 0.06em;
+        }
+
+        .cell-wr {
+            font-weight: 600;
+        }
+
+        .wr-90 { color: var(--green); }
+        .wr-75 { color: var(--yellow); }
+        .wr-60 { color: var(--muted); }
+
+        .wr-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .wr-bar-track {
+            width: 72px;
+            height: 2px;
+            background: var(--border-hi);
+            border-radius: 1px;
+            overflow: hidden;
+        }
+
+        .wr-bar-fill {
+            height: 100%;
+            border-radius: 1px;
+            width: 0;
+            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .wr-fill-90 { background: var(--green); }
+        .wr-fill-75 { background: var(--yellow); }
+        .wr-fill-60 { background: var(--muted); }
+
+        .cell-wt { color: var(--muted); font-size: 0.75rem; }
+
+        .cell-pnl { font-weight: 600; }
+        .pnl-pos { color: var(--green); }
+        .pnl-neg { color: var(--red); }
+
+        .cell-vol { color: var(--muted); font-size: 0.75rem; }
+
+        .cell-signal {
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+        }
+
+        .sig-hot {
+            color: var(--orange);
+            border: 1px solid rgba(255,92,26,0.3);
+            padding: 2px 8px;
+        }
+
+        .sig-strong {
+            color: var(--green);
+            border: 1px solid rgba(0,232,120,0.3);
+            padding: 2px 8px;
+        }
+
+        .sig-watch {
+            color: var(--yellow);
+            border: 1px solid rgba(251,191,36,0.3);
+            padding: 2px 8px;
+        }
+
+        /* ─── PAYWALL ─── */
+        .paywall-section {
+            margin-top: 32px;
+            border: 1px solid var(--border-hi);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .paywall-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(200,240,61,0.04) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .paywall-inner {
+            padding: 48px 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .paywall-stamp {
+            display: inline-block;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 0.3em;
+            color: var(--orange);
+            border: 2px solid var(--orange);
+            padding: 6px 24px;
+            margin-bottom: 28px;
+            transform: rotate(-2deg);
+            opacity: 0.9;
+        }
+
+        .paywall-headline {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            letter-spacing: 0.04em;
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .paywall-headline span { color: var(--lime); }
+
+        .paywall-sub {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-bottom: 36px;
+            line-height: 1.8;
+            max-width: 440px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .paywall-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            background: var(--border);
+            max-width: 500px;
+            margin: 0 auto 36px;
+        }
+
+        .paywall-stat {
+            background: var(--bg-card);
+            padding: 20px;
+        }
+
+        .paywall-stat-val {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.2rem;
+            letter-spacing: 0.03em;
+            line-height: 1;
+            color: var(--lime);
+            margin-bottom: 4px;
+        }
+
+        .paywall-stat-lbl {
+            font-size: 0.6rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .paywall-includes {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+
+        .paywall-chip {
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border: 1px solid var(--border-hi);
+            padding: 4px 12px;
+        }
+
+        .paywall-chip.active {
+            color: var(--lime);
+            border-color: rgba(200,240,61,0.3);
+            background: rgba(200,240,61,0.04);
+        }
+
+        .paywall-price-row {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
-            font-weight: 600;
+            gap: 24px;
+            margin-bottom: 28px;
         }
-        
-        .trader-name { color: var(--text); }
-        .trader-name.blurred { color: var(--text-dim); filter: blur(5px); user-select: none; }
-        
-        .win-rate { font-weight: 600; }
-        .win-high { color: var(--green); }
-        .win-mid { color: #eab308; }
-        .win-low { color: var(--text-muted); }
-        
-        .pnl-positive { color: var(--green); }
-        .pnl-negative { color: var(--red); }
-        .volume { color: var(--text-muted); }
-        
-        .paywall-row { background: rgba(139, 92, 246, 0.05); }
-        
-        .cta-section{
-            text-align: center;
-            margin-top: 40px;
-            padding: 40px;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.05) 100%);
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            border-radius: 16px;
+
+        .paywall-price {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3.5rem;
+            letter-spacing: 0.03em;
+            color: var(--lime);
+            line-height: 1;
         }
-        
-        .cta-section h2 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 16px;
+
+        .paywall-price-note {
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--dim);
+            text-align: left;
+            line-height: 1.6;
         }
-        
-        .cta-section p { color: var(--text-muted); margin-bottom: 24px; }
-        
-        .cta-button{
+
+        .btn-paywall {
             display: inline-block;
-            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
-            color: white;
-            padding: 14px 32px;
-            border-radius: 10px;
+            background: var(--lime);
+            color: var(--bg);
+            font-family: 'IBM Plex Mono', monospace;
             font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 16px 48px;
             text-decoration: none;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.2s ease;
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
         }
-        
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+
+        .btn-paywall:hover {
+            background: #d9ff55;
+            box-shadow: 0 0 32px rgba(200,240,61,0.3);
+            transform: translateY(-1px);
         }
-        
-        footer{
-            text-align: center;
+
+        .paywall-guarantee {
+            margin-top: 16px;
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            color: var(--dim);
+        }
+
+        /* ─── FOOTER ─── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 28px 0;
             margin-top: 40px;
-            padding: 24px;
-            color: var(--text-dim);
-            font-size: 0.8rem;
         }
-        
-        footer a { color: var(--accent); text-decoration: none; }
-        
-        @media (max-width: 640px) {
-            .stats-bar { flex-direction: column; gap: 20px; }
-            h1 { font-size: 1.5rem; }
-            table { font-size: 0.75rem; }
-            td, th { padding: 10px 8px; }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-meta {
+            font-size: 0.65rem;
+            color: var(--dim);
+            letter-spacing: 0.05em;
+        }
+
+        .footer-meta a {
+            color: var(--muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-meta a:hover { color: var(--text); }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 768px) {
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .paywall-grid { grid-template-columns: 1fr 1fr; }
+            .page-header-inner { grid-template-columns: 1fr; }
+            .footer-inner { flex-direction: column; gap: 12px; text-align: center; }
+            th:nth-child(6), td:nth-child(6),
+            th:nth-child(7), td:nth-child(7) { display: none; }
+        }
+
+        @media (max-width: 540px) {
+            .stats-bar { grid-template-columns: 1fr 1fr; }
+            .paywall-grid { grid-template-columns: 1fr; }
+            th:nth-child(5), td:nth-child(5) { display: none; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>📈 Polymarket Crypto Leaderboard</h1>
-            <p class="subtitle">Top traders ranked by win rate — crypto markets only</p>
-            <p class="updated">Last updated: March 5, 2026 · Next update in 24 hours</p>
-        </header>
-        
-        <div class="stats-bar">
-            <div class="stat">
-                <div class="stat-value">9</div>
-                <div class="stat-label">Wallets at 90%+ win rate</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value">$150.2K</div>
-                <div class="stat-label">Combined weekly profits</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value">634</div>
-                <div class="stat-label">Trades analyzed</div>
+
+    <!-- NAV -->
+    <nav>
+        <div class="container">
+            <div class="nav-inner">
+                <a href="/" class="back-link">polysauce.xyz</a>
+                <a href="/" class="logo">POLY<span>.</span>SAUCE</a>
+                <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="btn-primary">Unlock Full Access — $65</a>
             </div>
         </div>
-        
-        <div class="table-container">
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div class="container">
+            <div class="page-header-inner">
+                <div>
+                    <div class="terminal-label">POLYMARKET_INTEL // CRYPTO MARKETS // WIN RATE LEADERBOARD</div>
+                    <h1 class="page-title">WIN RATE<br><span>LEADERBOARD</span></h1>
+                    <p class="page-subtitle">
+                        Top traders ranked by win rate across all crypto prediction markets.<br>
+                        7-day window · On-chain data · Updated daily at 00:00 UTC
+                    </p>
+                </div>
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    Live · Mar 5, 2026
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- STATS BAR -->
+        <div class="stats-bar">
+            <div class="stats-bar-item">
+                <div class="sb-val" data-count="9">9</div>
+                <div class="sb-lbl">Wallets at 90%+ WR</div>
+            </div>
+            <div class="stats-bar-item">
+                <div class="sb-val green">$150.2K</div>
+                <div class="sb-lbl">Combined weekly PnL</div>
+            </div>
+            <div class="stats-bar-item">
+                <div class="sb-val" data-count="634">634</div>
+                <div class="sb-lbl">Trades analyzed</div>
+            </div>
+            <div class="stats-bar-item">
+                <div class="sb-val">20</div>
+                <div class="sb-lbl">Traders tracked</div>
+            </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filters">
+            <div class="filter-tabs">
+                <button class="filter-tab active">All Ranks</button>
+                <button class="filter-tab">90%+ WR</button>
+                <button class="filter-tab">High Volume</button>
+            </div>
+            <span class="filter-meta">// Crypto markets only · Last 7 days</span>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
-                        <th>Rank</th>
-                        <th>Trader</th>
-                        <th>Win %</th>
+                        <th>#</th>
+                        <th>Trader Address</th>
+                        <th class="sortable sort-active">Win Rate ↓</th>
                         <th>W/T</th>
-                        <th>PnL</th>
+                        <th>7D PnL</th>
                         <th>Volume</th>
+                        <th>Signal</th>
                     </tr>
                 </thead>
                 <tbody>
-                    
-                    <tr class="paywall-row">
-                        <td class="rank rank-1">1</td>
+                    <tr class="row-gold">
+                        <td class="cell-rank">01</td>
+                        <td><span class="cell-addr locked">0x4a2f...c8d1</span></td>
                         <td>
-                            <span class="trader-name blurred">████████████</span>
+                            <div class="wr-bar-wrap">
+                                <span class="cell-wr wr-90">98.0%</span>
+                                <div class="wr-bar-track"><div class="wr-bar-fill wr-fill-90" data-width="98"></div></div>
+                            </div>
                         </td>
-                        <td class="win-rate win-high">98.0%</td>
-                        <td>21/22</td>
-                        <td class="pnl-positive">+$9,094</td>
-                        <td class="volume">$84,787</td>
+                        <td class="cell-wt">21/22</td>
+                        <td class="cell-pnl pnl-pos">+$9,094</td>
+                        <td class="cell-vol">$84.8K</td>
+                        <td><span class="cell-signal sig-hot">HOT</span></td>
                     </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank rank-2">2</td>
+                    <tr class="row-silver">
+                        <td class="cell-rank">02</td>
+                        <td><span class="cell-addr locked">0xbb91...f432</span></td>
                         <td>
-                            <span class="trader-name blurred">████████████</span>
+                            <div class="wr-bar-wrap">
+                                <span class="cell-wr wr-90">98.0%</span>
+                                <div class="wr-bar-track"><div class="wr-bar-fill wr-fill-90" data-width="98"></div></div>
+                            </div>
                         </td>
-                        <td class="win-rate win-high">98.0%</td>
-                        <td>35/36</td>
-                        <td class="pnl-positive">+$7,216</td>
-                        <td class="volume">$16,681</td>
+                        <td class="cell-wt">35/36</td>
+                        <td class="cell-pnl pnl-pos">+$7,216</td>
+                        <td class="cell-vol">$16.7K</td>
+                        <td><span class="cell-signal sig-strong">STRONG</span></td>
                     </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank rank-3">3</td>
+                    <tr class="row-bronze">
+                        <td class="cell-rank">03</td>
+                        <td><span class="cell-addr locked">0x77ae...2901</span></td>
                         <td>
-                            <span class="trader-name blurred">████████████</span>
+                            <div class="wr-bar-wrap">
+                                <span class="cell-wr wr-90">95.6%</span>
+                                <div class="wr-bar-track"><div class="wr-bar-fill wr-fill-90" data-width="95.6"></div></div>
+                            </div>
                         </td>
-                        <td class="win-rate win-high">95.6%</td>
-                        <td>20/21</td>
-                        <td class="pnl-positive">+$2,672</td>
-                        <td class="volume">$60,119</td>
+                        <td class="cell-wt">20/21</td>
+                        <td class="cell-pnl pnl-pos">+$2,672</td>
+                        <td class="cell-vol">$60.1K</td>
+                        <td><span class="cell-signal sig-strong">STRONG</span></td>
                     </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">4</td>
+                    <tr>
+                        <td class="cell-rank">04</td>
+                        <td><span class="cell-addr locked">0xc73e...8b44</span></td>
                         <td>
-                            <span class="trader-name blurred">████████████</span>
+                            <div class="wr-bar-wrap">
+                                <span class="cell-wr wr-90">94.5%</span>
+                                <div class="wr-bar-track"><div class="wr-bar-fill wr-fill-90" data-width="94.5"></div></div>
+                            </div>
                         </td>
-                        <td class="win-rate win-high">94.5%</td>
-                        <td>39/42</td>
-                        <td class="pnl-positive">+$9,246</td>
-                        <td class="volume">$29,806</td>
+                        <td class="cell-wt">39/42</td>
+                        <td class="cell-pnl pnl-pos">+$9,246</td>
+                        <td class="cell-vol">$29.8K</td>
+                        <td><span class="cell-signal sig-hot">HOT</span></td>
                     </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">5</td>
+                    <tr>
+                        <td class="cell-rank">05</td>
+                        <td><span class="cell-addr locked">0x1d50...aa77</span></td>
                         <td>
-                            <span class="trader-name blurred">████████████</span>
+                            <div class="wr-bar-wrap">
+                                <span class="cell-wr wr-90">93.6%</span>
+                                <div class="wr-bar-track"><div class="wr-bar-fill wr-fill-90" data-width="93.6"></div></div>
+                            </div>
                         </td>
-                        <td class="win-rate win-high">93.6%</td>
-                        <td>25/27</td>
-                        <td class="pnl-positive">+$4,281</td>
-                        <td class="volume">$50,447</td>
+                        <td class="cell-wt">25/27</td>
+                        <td class="cell-pnl pnl-pos">+$4,281</td>
+                        <td class="cell-vol">$50.4K</td>
+                        <td><span class="cell-signal sig-strong">STRONG</span></td>
                     </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">6</td>
+                    <tr>
+                        <td class="cell-rank">06</td>
+                        <td><span class="cell-addr locked">0x83fa...7c19</span></td>
                         <td>
-                            <span class="trader-name blurred">████████████</span>
+                            <div class="wr-bar-wrap">
+                                <span class="cell-wr wr-90">93.2%</span>
+                                <div class="wr-bar-track"><div class="wr-bar-fill wr-fill-90" data-width="93.2"></div></div>
+                            </div>
                         </td>
-                        <td class="win-rate win-high">93.2%</td>
-                        <td>27/29</td>
-                        <td class="pnl-positive">+$8,345</td>
-                        <td class="volume">$73,840</td>
+                        <td class="cell-wt">27/29</td>
+                        <td class="cell-pnl pnl-pos">+$8,345</td>
+                        <td class="cell-vol">$73.8K</td>
+                        <td><span class="cell-signal sig-hot">HOT</span></td>
                     </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">7</td>
+                    <tr>
+                        <td class="cell-rank">07</td>
+                        <td><span class="cell-addr locked">0x9d11...3f9c</span></td>
                         <td>
-                            <span class="trader-name blurred">████████████</span>
+                            <div class="wr-bar-wrap">
+                                <span class="cell-wr wr-90">92.6%</span>
+                                <div class="wr-bar-track"><div class="wr-bar-fill wr-fill-90" data-width="92.6"></div></div>
+                            </div>
                         </td>
-                        <td class="win-rate win-high">92.6%</td>
-                        <td>26/29</td>
-                        <td class="pnl-positive">+$7,596</td>
-                        <td class="volume">$64,027</td>
+                        <td class="cell-wt">26/29</td>
+                        <td class="cell-pnl pnl-pos">+$7,596</td>
+                        <td class="cell-vol">$64.0K</td>
+                        <td><span class="cell-signal sig-strong">STRONG</span></td>
                     </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">8</td>
+                    <tr>
+                        <td class="cell-rank">08</td>
+                        <td><span class="cell-addr locked">0xe2c4...0af8</span></td>
                         <td>
-                            <span class="trader-name blurred">████████████</span>
+                            <div class="wr-bar-wrap">
+                                <span class="cell-wr wr-90">91.3%</span>
+                                <div class="wr-bar-track"><div class="wr-bar-fill wr-fill-90" data-width="91.3"></div></div>
+                            </div>
                         </td>
-                        <td class="win-rate win-high">91.3%</td>
-                        <td>44/49</td>
-                        <td class="pnl-positive">+$12,321</td>
-                        <td class="volume">$17,675</td>
+                        <td class="cell-wt">44/49</td>
+                        <td class="cell-pnl pnl-pos">+$12,321</td>
+                        <td class="cell-vol">$17.7K</td>
+                        <td><span class="cell-signal sig-hot">HOT</span></td>
                     </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">9</td>
+                    <tr>
+                        <td class="cell-rank">09</td>
+                        <td><span class="cell-addr locked">0x5b7d...e341</span></td>
                         <td>
-                            <span class="trader-name blurred">████████████</span>
+                            <div class="wr-bar-wrap">
+                                <span class="cell-wr wr-90">90.5%</span>
+                                <div class="wr-bar-track"><div class="wr-bar-fill wr-fill-90" data-width="90.5"></div></div>
+                            </div>
                         </td>
-                        <td class="win-rate win-high">90.5%</td>
-                        <td>26/29</td>
-                        <td class="pnl-positive">+$9,220</td>
-                        <td class="volume">$81,479</td>
+                        <td class="cell-wt">26/29</td>
+                        <td class="cell-pnl pnl-pos">+$9,220</td>
+                        <td class="cell-vol">$81.5K</td>
+                        <td><span class="cell-signal sig-strong">STRONG</span></td>
                     </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">10</td>
+                    <tr>
+                        <td class="cell-rank">10</td>
+                        <td><span class="cell-addr locked">0xf019...b2ee</span></td>
                         <td>
-                            <span class="trader-name blurred">████████████</span>
+                            <div class="wr-bar-wrap">
+                                <span class="cell-wr wr-75">89.5%</span>
+                                <div class="wr-bar-track"><div class="wr-bar-fill wr-fill-75" data-width="89.5"></div></div>
+                            </div>
                         </td>
-                        <td class="win-rate win-high">89.5%</td>
-                        <td>36/41</td>
-                        <td class="pnl-positive">+$4,459</td>
-                        <td class="volume">$91,816</td>
+                        <td class="cell-wt">36/41</td>
+                        <td class="cell-pnl pnl-pos">+$4,459</td>
+                        <td class="cell-vol">$91.8K</td>
+                        <td><span class="cell-signal sig-watch">WATCH</span></td>
                     </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">11</td>
-                        <td>
-                            <span class="trader-name blurred">████████████</span>
-                        </td>
-                        <td class="win-rate win-high">89.2%</td>
-                        <td>32/36</td>
-                        <td class="pnl-positive">+$8,732</td>
-                        <td class="volume">$74,413</td>
+                    <tr class="row-locked">
+                        <td class="cell-rank">11</td>
+                        <td><span class="cell-addr locked">████████████</span></td>
+                        <td><span class="cell-wr wr-75">89.2%</span></td>
+                        <td class="cell-wt">32/36</td>
+                        <td class="cell-pnl pnl-pos">+$8,732</td>
+                        <td class="cell-vol">$74.4K</td>
+                        <td><span class="cell-signal sig-watch">WATCH</span></td>
                     </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">12</td>
-                        <td>
-                            <span class="trader-name blurred">████████████</span>
-                        </td>
-                        <td class="win-rate win-high">87.7%</td>
-                        <td>19/22</td>
-                        <td class="pnl-positive">+$6,196</td>
-                        <td class="volume">$86,136</td>
+                    <tr class="row-locked">
+                        <td class="cell-rank">12</td>
+                        <td><span class="cell-addr locked">████████████</span></td>
+                        <td><span class="cell-wr wr-75">87.7%</span></td>
+                        <td class="cell-wt">19/22</td>
+                        <td class="cell-pnl pnl-pos">+$6,196</td>
+                        <td class="cell-vol">$86.1K</td>
+                        <td>—</td>
                     </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">13</td>
-                        <td>
-                            <span class="trader-name blurred">████████████</span>
+                    <tr class="row-locked">
+                        <td class="cell-rank">13–20</td>
+                        <td colspan="6" style="color: var(--dim); font-size: 0.7rem; letter-spacing: 0.06em;">
+                            <span class="lock-icon">// LOCKED — Unlock all 20 traders with full wallet addresses →</span>
                         </td>
-                        <td class="win-rate win-high">87.6%</td>
-                        <td>35/41</td>
-                        <td class="pnl-positive">+$8,078</td>
-                        <td class="volume">$30,509</td>
-                    </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">14</td>
-                        <td>
-                            <span class="trader-name blurred">████████████</span>
-                        </td>
-                        <td class="win-rate win-high">85.9%</td>
-                        <td>37/44</td>
-                        <td class="pnl-positive">+$15,882</td>
-                        <td class="volume">$80,167</td>
-                    </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">15</td>
-                        <td>
-                            <span class="trader-name blurred">████████████</span>
-                        </td>
-                        <td class="win-rate win-high">85.3%</td>
-                        <td>19/23</td>
-                        <td class="pnl-positive">+$7,712</td>
-                        <td class="volume">$69,125</td>
-                    </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">16</td>
-                        <td>
-                            <span class="trader-name blurred">████████████</span>
-                        </td>
-                        <td class="win-rate win-mid">77.8%</td>
-                        <td>20/27</td>
-                        <td class="pnl-positive">+$6,695</td>
-                        <td class="volume">$86,308</td>
-                    </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">17</td>
-                        <td>
-                            <span class="trader-name blurred">████████████</span>
-                        </td>
-                        <td class="win-rate win-mid">77.2%</td>
-                        <td>31/41</td>
-                        <td class="pnl-positive">+$4,956</td>
-                        <td class="volume">$38,006</td>
-                    </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">18</td>
-                        <td>
-                            <span class="trader-name blurred">████████████</span>
-                        </td>
-                        <td class="win-rate win-mid">75.5%</td>
-                        <td>16/22</td>
-                        <td class="pnl-positive">+$3,902</td>
-                        <td class="volume">$80,338</td>
-                    </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">19</td>
-                        <td>
-                            <span class="trader-name blurred">████████████</span>
-                        </td>
-                        <td class="win-rate win-mid">75.2%</td>
-                        <td>24/33</td>
-                        <td class="pnl-positive">+$8,871</td>
-                        <td class="volume">$61,986</td>
-                    </tr>
-
-                    <tr class="paywall-row">
-                        <td class="rank ">20</td>
-                        <td>
-                            <span class="trader-name blurred">████████████</span>
-                        </td>
-                        <td class="win-rate win-mid">75.1%</td>
-                        <td>15/20</td>
-                        <td class="pnl-positive">+$4,746</td>
-                        <td class="volume">$33,688</td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        
-        <div class="cta-section">
-            <h2>🔓 Unlock Full Leaderboard Access</h2>
-            <p>Get the complete guide + full trader names + bot setup instructions</p>
-            <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="cta-button">Get the Guide - $65</a>
+
+        <!-- PAYWALL -->
+        <div class="paywall-section">
+            <div class="paywall-inner">
+                <div class="paywall-stamp">CLASSIFIED</div>
+
+                <h2 class="paywall-headline">UNLOCK ALL 20<br><span>TRADER WALLETS</span></h2>
+
+                <p class="paywall-sub">
+                    Get the complete leaderboard with full wallet addresses, plus the copy trade bot
+                    setup guide and 8-chapter masterclass. One trade can pay for this.
+                </p>
+
+                <div class="paywall-grid">
+                    <div class="paywall-stat">
+                        <div class="paywall-stat-val">20</div>
+                        <div class="paywall-stat-lbl">Traders tracked</div>
+                    </div>
+                    <div class="paywall-stat">
+                        <div class="paywall-stat-val">$150K</div>
+                        <div class="paywall-stat-lbl">Weekly profits</div>
+                    </div>
+                    <div class="paywall-stat">
+                        <div class="paywall-stat-val">98%</div>
+                        <div class="paywall-stat-lbl">Top win rate</div>
+                    </div>
+                </div>
+
+                <div class="paywall-includes">
+                    <span class="paywall-chip active">Full Leaderboard</span>
+                    <span class="paywall-chip active">Wallet Addresses</span>
+                    <span class="paywall-chip active">Copy Bot Guide</span>
+                    <span class="paywall-chip active">8-Chapter Masterclass</span>
+                    <span class="paywall-chip active">Risk Management</span>
+                    <span class="paywall-chip active">AI Signal Integration</span>
+                </div>
+
+                <div class="paywall-price-row">
+                    <div class="paywall-price">$65</div>
+                    <div class="paywall-price-note">One-time payment<br>Lifetime access<br>30-day guarantee</div>
+                </div>
+
+                <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="btn-paywall">Get Full Access Now</a>
+                <p class="paywall-guarantee">// Instant delivery · PDF + Markdown · 30-day money-back guarantee</p>
+            </div>
         </div>
-        
-        <footer>
-            <p>Data sourced from Polymarket public blockchain records</p>
-            <p style="margin-top: 8px;"><a href="/">← Back to polysauce.xyz</a></p>
-        </footer>
+
     </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-inner">
+                <span class="footer-meta">// Data sourced from Polymarket public blockchain · crypto markets only</span>
+                <span class="footer-meta"><a href="/">← polysauce.xyz</a> · Built by <a href="https://vibestak.com" target="_blank">vibestak</a></span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Animate win rate bars on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelectorAll('.wr-bar-fill[data-width]').forEach(bar => {
+                    bar.style.width = bar.dataset.width + '%';
+                });
+            }, 300);
+        });
+
+        // Count-up for stats
+        function countUp(el, target) {
+            const duration = 1400;
+            const start = performance.now();
+            const step = (now) => {
+                const p = Math.min((now - start) / duration, 1);
+                const ease = 1 - Math.pow(1 - p, 3);
+                el.textContent = Math.round(ease * target).toLocaleString();
+                if (p < 1) requestAnimationFrame(step);
+                else el.textContent = target.toLocaleString();
+            };
+            requestAnimationFrame(step);
+        }
+
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    const el = e.target;
+                    countUp(el, parseInt(el.dataset.count));
+                    observer.unobserve(el);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('[data-count]').forEach(el => observer.observe(el));
+
+        // Filter tabs (UI only)
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>

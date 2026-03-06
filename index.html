@@ -3,1062 +3,1633 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Polysauce — Find the Best Polymarket Traders</title>
-    <meta name="description" content="Learn how to build a bot that automatically copies the best Polymarket traders. Complete guide with AI agent support.">
+    <title>POLYSAUCE — Polymarket Win Rate Intelligence</title>
+    <meta name="description" content="The best Polymarket traders tracked by win rate. Copy them automatically with our bot + masterclass guide.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg-primary: #0a0a0b;
-            --bg-secondary: #111113;
-            --bg-tertiary: #1a1a1d;
-            --accent-purple: #8b5cf6;
-            --accent-purple-hover: #7c3aed;
-            --accent-purple-dark: #6d28d9;
-            --text-primary: #ffffff;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --border-color: #27272a;
-            --success-green: #22c55e;
-            --warning-yellow: #eab308;
-            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
-            --gradient-dark: linear-gradient(180deg, #0a0a0b 0%, #111113 100%);
+            --bg:        #070706;
+            --bg-card:   #0f0f0e;
+            --bg-raised: #161614;
+            --lime:      #c8f03d;
+            --lime-dim:  #8aaa28;
+            --orange:    #ff5c1a;
+            --green:     #00e878;
+            --red:       #ff3352;
+            --text:      #e8e8de;
+            --muted:     #6a6a5e;
+            --dim:       #3a3a30;
+            --border:    #1e1e1a;
+            --border-hi: #2e2e28;
         }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
+            font-family: 'IBM Plex Mono', monospace;
+            background-color: var(--bg);
+            color: var(--text);
             line-height: 1.6;
             overflow-x: hidden;
+            position: relative;
         }
 
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            line-height: 1.2;
+        /* Noise texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.4;
+        }
+
+        /* Scanlines */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.08) 2px,
+                rgba(0,0,0,0.08) 4px
+            );
+            pointer-events: none;
+            z-index: 9998;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 0 24px;
         }
 
-        /* Header */
+        /* ─── HEADER ─── */
         header {
-            padding: 20px 0;
-            border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
-            background: var(--bg-primary);
             z-index: 100;
-            backdrop-filter: blur(10px);
-            background: rgba(10, 10, 11, 0.9);
+            background: rgba(7, 7, 6, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
         }
 
-        .header-content {
+        .header-inner {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
         }
 
         .logo {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: var(--gradient-purple);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .cta-button {
-            background: var(--gradient-purple);
-            color: white;
-            padding: 12px 28px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1rem;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.75rem;
+            letter-spacing: 0.1em;
+            color: var(--lime);
             text-decoration: none;
-            transition: all 0.3s ease;
+        }
+
+        .logo-dot { color: var(--orange); }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-link {
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover { color: var(--text); }
+
+        .btn-primary {
             display: inline-block;
-            border: none;
-            cursor: pointer;
+            background: var(--lime);
+            color: var(--bg);
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 10px 24px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
         }
 
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+        .btn-primary:hover {
+            background: #d9ff55;
+            transform: translateY(-1px);
+            box-shadow: 0 0 24px rgba(200, 240, 61, 0.3);
         }
 
-        /* Hero Section */
+        .btn-primary.large {
+            font-size: 0.875rem;
+            padding: 16px 40px;
+        }
+
+        /* ─── HERO ─── */
         .hero {
-            padding: 120px 0 80px;
+            padding: 80px 0 64px;
             position: relative;
-            overflow: hidden;
         }
 
-        .hero::before {
-            content: '';
+        .hero-glow {
             position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
-            border-radius: 50%;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 700px;
+            height: 400px;
+            background: radial-gradient(ellipse, rgba(200,240,61,0.06) 0%, transparent 70%);
             pointer-events: none;
         }
 
-        .hero-content {
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto;
+        .terminal-prompt {
+            font-size: 0.7rem;
+            color: var(--lime-dim);
+            letter-spacing: 0.1em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-prompt::before {
+            content: '>';
+            color: var(--lime);
+            font-size: 0.85rem;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 14px;
+            background: var(--lime);
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
 
         .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 24px;
-            background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(3.5rem, 8vw, 7rem);
+            line-height: 0.92;
+            letter-spacing: 0.02em;
+            margin-bottom: 28px;
+            color: var(--text);
         }
 
-        .hero .subtitle {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            margin-bottom: 40px;
+        .hero h1 .highlight {
+            color: var(--lime);
+            display: block;
         }
 
-        .hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 48px;
-            margin-bottom: 48px;
+        .hero-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: start;
         }
 
-        .stat {
-            text-align: center;
-        }
+        .hero-left {}
 
-        .stat-value {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--success-green);
-        }
-
-        .stat-label {
+        .hero-sub {
             font-size: 0.875rem;
-            color: var(--text-muted);
-            margin-top: 4px;
+            color: var(--muted);
+            line-height: 1.8;
+            margin-bottom: 36px;
+            max-width: 420px;
         }
 
-        /* Social Proof Section */
-        .social-proof {
-            padding: 60px 0;
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
+        .hero-sub strong {
+            color: var(--text);
+            font-weight: 600;
         }
 
-        .social-proof-content {
-            text-align: center;
+        .hero-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-start;
         }
 
-        .social-proof h2 {
-            font-size: 2rem;
-            margin-bottom: 16px;
+        .btn-secondary {
+            font-size: 0.7rem;
+            color: var(--muted);
+            text-decoration: none;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
         }
 
-        .social-proof p {
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-            font-size: 1.125rem;
+        .btn-secondary::before { content: '→'; color: var(--lime); }
+        .btn-secondary:hover { color: var(--text); }
+
+        /* ─── HERO STATS ─── */
+        .hero-right {}
+
+        .stat-block {
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            padding: 0;
+            overflow: hidden;
         }
 
-        .leaderboard-link {
+        .stat-block-header {
+            background: var(--border);
+            padding: 8px 16px;
+            font-size: 0.65rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-block-header::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--lime);
+            box-shadow: 0 0 6px var(--lime);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { box-shadow: 0 0 4px var(--lime); }
+            50% { box-shadow: 0 0 12px var(--lime); }
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .stat-cell {
+            padding: 20px 20px;
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat-cell:nth-child(2n) { border-right: none; }
+        .stat-cell:nth-last-child(-n+2) { border-bottom: none; }
+
+        .stat-val {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.4rem;
+            letter-spacing: 0.02em;
+            line-height: 1;
+            color: var(--lime);
+            margin-bottom: 4px;
+        }
+
+        .stat-val.green { color: var(--green); }
+        .stat-val.orange { color: var(--orange); }
+
+        .stat-lbl {
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        /* ─── TICKER ─── */
+        .ticker {
+            background: var(--border);
+            border-top: 1px solid var(--border-hi);
+            border-bottom: 1px solid var(--border-hi);
+            padding: 10px 0;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .ticker::before, .ticker::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 80px;
+            z-index: 2;
+        }
+
+        .ticker::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); }
+        .ticker::after { right: 0; background: linear-gradient(to left, var(--bg), transparent); }
+
+        .ticker-track {
+            display: inline-flex;
+            gap: 0;
+            animation: ticker 40s linear infinite;
+        }
+
+        .ticker-track:hover { animation-play-state: paused; }
+
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .ticker-item {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            color: var(--accent-purple);
-            text-decoration: none;
-            font-weight: 600;
-            transition: gap 0.3s ease;
+            padding: 0 32px;
+            font-size: 0.7rem;
+            letter-spacing: 0.06em;
+            color: var(--muted);
         }
 
-        .leaderboard-link:hover {
+        .ticker-item .up { color: var(--green); }
+        .ticker-item .down { color: var(--red); }
+        .ticker-sep { color: var(--dim); }
+
+        /* ─── SECTION LABEL ─── */
+        .section-label {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--lime);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
             gap: 12px;
         }
 
-        /* Leaderboard Preview Section */
-        .leaderboard-preview {
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            letter-spacing: 0.03em;
+            line-height: 1;
+            color: var(--text);
+            margin-bottom: 16px;
+        }
+
+        .section-desc {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.8;
+            max-width: 520px;
+        }
+
+        /* ─── LEADERBOARD PREVIEW ─── */
+        .leaderboard-section {
             padding: 80px 0;
-            background: var(--bg-secondary);
+            background: var(--bg);
         }
 
-        .leaderboard-container {
+        .lb-wrapper {
             position: relative;
-            max-width: 800px;
-            margin: 0 auto;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            background: var(--bg-tertiary);
+            margin-top: 40px;
         }
 
-        .leaderboard-table {
+        .lb-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-raised);
+            border: 1px solid var(--border);
+            border-bottom: none;
+            padding: 12px 20px;
+        }
+
+        .lb-title {
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text);
+        }
+
+        .lb-live {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--green);
+        }
+
+        .lb-live::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse-dot 1.5s ease-in-out infinite;
+        }
+
+        .lb-table {
             width: 100%;
             border-collapse: collapse;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
+            border: 1px solid var(--border);
         }
 
-        .leaderboard-table thead {
-            background: var(--bg-primary);
-            border-bottom: 1px solid var(--border-color);
+        .lb-table thead {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-hi);
         }
 
-        .leaderboard-table th {
-            padding: 16px 12px;
+        .lb-table th {
+            padding: 12px 16px;
             text-align: left;
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.6rem;
+            letter-spacing: 0.15em;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            color: var(--muted);
+            font-weight: 500;
         }
 
-        .leaderboard-table td {
-            padding: 14px 12px;
-            border-bottom: 1px solid var(--border-color);
+        .lb-table td {
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
         }
 
-        .leaderboard-table tr:last-child td {
-            border-bottom: none;
-        }
+        .lb-table tbody tr:hover td { background: rgba(200,240,61,0.02); }
+        .lb-table tbody tr:last-child td { border-bottom: none; }
 
-        .blurred {
-            color: var(--text-muted);
-            filter: blur(4px);
-            user-select: none;
-        }
-
-        .blurred-row {
-            background: rgba(139, 92, 246, 0.03);
-        }
-
-        .win-rate {
-            color: #22c55e;
+        .rank-num {
+            font-size: 0.7rem;
+            color: var(--dim);
             font-weight: 600;
+            min-width: 28px;
         }
 
-        .positive {
-            color: #22c55e;
+        .rank-1 .rank-num { color: #f5c842; }
+        .rank-2 .rank-num { color: #aaaaaa; }
+        .rank-3 .rank-num { color: #c87432; }
+
+        .trader-addr {
+            font-size: 0.75rem;
+            color: var(--muted);
         }
 
-        .negative {
-            color: #ef4444;
+        .trader-addr.blurred {
+            filter: blur(5px);
+            user-select: none;
+            color: var(--dim);
         }
 
-        .paywall-overlay {
+        .wr {
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .wr-90 { color: var(--green); }
+        .wr-75 { color: #fbbf24; }
+
+        .pnl-pos { color: var(--green); }
+        .pnl-neg { color: var(--red); }
+        .vol-cell { color: var(--muted); font-size: 0.75rem; }
+
+        .wr-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wr-bar-track {
+            width: 60px;
+            height: 3px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .wr-bar-fill {
+            height: 100%;
+            background: var(--green);
+            border-radius: 2px;
+            transition: width 1s ease;
+        }
+
+        /* Paywall overlay */
+        .lb-paywall {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 65%;
-            background: linear-gradient(to bottom, transparent 0%, var(--bg-tertiary) 20%, var(--bg-tertiary) 100%);
+            height: 60%;
+            background: linear-gradient(to bottom, transparent 0%, var(--bg) 22%);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 40px;
+        }
+
+        .lb-paywall-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-hi);
+            padding: 32px 40px;
+            text-align: center;
+            max-width: 440px;
+            width: 100%;
+            position: relative;
+        }
+
+        .lb-paywall-box::before {
+            content: 'CLASSIFIED';
+            position: absolute;
+            top: -11px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--orange);
+            color: var(--bg);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.2em;
+            padding: 2px 16px;
+        }
+
+        .lb-paywall-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 20px;
+        }
+
+        .lp-stat-val {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            color: var(--lime);
+            display: block;
+            letter-spacing: 0.05em;
+        }
+
+        .lp-stat-lbl {
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .lb-paywall-text {
+            font-size: 0.7rem;
+            color: var(--muted);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .lb-note {
+            font-size: 0.65rem;
+            color: var(--dim);
+            text-align: center;
+            margin-top: 14px;
+            letter-spacing: 0.05em;
+        }
+
+        /* ─── PRODUCTS ─── */
+        .products-section {
+            padding: 80px 0;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+            margin-top: 48px;
+            background: var(--border);
+        }
+
+        .product-card {
+            background: var(--bg-card);
+            padding: 40px;
+            position: relative;
+        }
+
+        .product-tag {
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--bg);
+            background: var(--lime);
+            padding: 3px 10px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .product-tag.orange { background: var(--orange); }
+
+        .product-card h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 0.05em;
+            color: var(--text);
+            margin-bottom: 12px;
+            line-height: 1;
+        }
+
+        .product-card p {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.8;
+            margin-bottom: 28px;
+        }
+
+        .product-features {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+
+        .product-features li {
+            font-size: 0.75rem;
+            color: var(--muted);
+            padding: 7px 0;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(2px);
+            gap: 10px;
         }
 
-        .paywall-content {
-            text-align: center;
-            padding: 40px;
+        .product-features li:last-child { border-bottom: none; }
+
+        .product-features li::before {
+            content: '//';
+            color: var(--lime);
+            font-weight: 600;
+            flex-shrink: 0;
         }
 
-        .paywall-stat {
-            margin-bottom: 16px;
-        }
-
-        .paywall-number {
-            display: block;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--accent-purple);
+        .product-price {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3rem;
+            letter-spacing: 0.05em;
+            color: var(--text);
+            line-height: 1;
             margin-bottom: 4px;
         }
 
-        .paywall-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .paywall-text {
-            color: var(--text-muted);
+        .product-price-note {
+            font-size: 0.65rem;
+            color: var(--dim);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
             margin-bottom: 20px;
-            font-size: 0.875rem;
         }
 
-        .leaderboard-note {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-top: 16px;
-        }
-
-        /* What You Get Section */
-        .what-you-get {
-            padding: 100px 0;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 64px;
-        }
-
-        .section-header h2 {
-            font-size: 2.5rem;
-            margin-bottom: 16px;
-        }
-
-        .section-header p {
-            color: var(--text-secondary);
-            font-size: 1.125rem;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 32px;
-        }
-
-        .feature-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 32px;
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover {
-            border-color: var(--accent-purple);
-            transform: translateY(-4px);
-        }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--gradient-purple);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-        }
-
-        .feature-card h3 {
-            font-size: 1.25rem;
-            margin-bottom: 12px;
-        }
-
-        .feature-card p {
-            color: var(--text-secondary);
-            font-size: 0.9375rem;
-        }
-
-        /* Chapters List */
+        /* ─── CHAPTERS ─── */
         .chapters-section {
-            padding: 100px 0;
-            background: var(--bg-secondary);
+            padding: 80px 0;
         }
 
-        .chapters-list {
-            max-width: 800px;
-            margin: 0 auto;
+        .chapters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+            background: var(--border);
+            margin-top: 48px;
         }
 
         .chapter-item {
+            background: var(--bg-card);
+            padding: 24px 28px;
             display: flex;
-            align-items: flex-start;
             gap: 20px;
-            padding: 24px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            margin-bottom: 16px;
-            transition: all 0.3s ease;
+            align-items: flex-start;
+            transition: background 0.2s;
         }
 
-        .chapter-item:hover {
-            border-color: var(--accent-purple);
+        .chapter-item:hover { background: var(--bg-raised); }
+
+        .ch-num {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            color: var(--dim);
+            line-height: 1;
+            min-width: 36px;
+            letter-spacing: 0.05em;
         }
 
-        .chapter-number {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
+        .ch-content {}
+
+        .ch-content h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.9rem;
             font-weight: 700;
-            color: var(--accent-purple);
-            min-width: 40px;
+            color: var(--text);
+            margin-bottom: 6px;
+            letter-spacing: 0.02em;
         }
 
-        .chapter-content h3 {
-            font-size: 1.125rem;
-            margin-bottom: 8px;
+        .ch-content p {
+            font-size: 0.72rem;
+            color: var(--muted);
+            line-height: 1.7;
         }
 
-        .chapter-content p {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
+        /* ─── PRICING ─── */
+        .pricing-section {
+            padding: 80px 0;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
         }
 
-        /* Pricing Section */
-        .pricing {
-            padding: 100px 0;
-        }
-
-        .pricing-card {
-            max-width: 500px;
-            margin: 0 auto;
-            background: var(--bg-secondary);
-            border: 2px solid var(--accent-purple);
-            border-radius: 16px;
-            padding: 48px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .pricing-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-purple);
-        }
-
-        .price-tag {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 4rem;
-            font-weight: 700;
-            margin: 24px 0;
-            background: var(--gradient-purple);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .price-subtitle {
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-            font-size: 1rem;
-        }
-
-        .value-statement {
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 32px;
-        }
-
-        .value-statement p {
-            color: var(--success-green);
-            font-weight: 600;
-            font-size: 1.125rem;
-        }
-
-        .pricing-cta {
-            width: 100%;
-            padding: 16px;
-            font-size: 1.125rem;
-        }
-
-        /* FAQ Section */
-        .faq {
-            padding: 100px 0;
-            background: var(--bg-secondary);
-        }
-
-        .faq-grid {
-            max-width: 800px;
-            margin: 0 auto;
+        .pricing-inner {
             display: grid;
-            gap: 24px;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+            margin-top: 48px;
+        }
+
+        .pricing-left {}
+
+        .pricing-left h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            letter-spacing: 0.03em;
+            line-height: 1;
+            color: var(--text);
+            margin-bottom: 16px;
+        }
+
+        .pricing-left h2 span { color: var(--lime); }
+
+        .pricing-left p {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.8;
+            margin-bottom: 28px;
+        }
+
+        .value-line {
+            background: var(--bg-raised);
+            border-left: 3px solid var(--lime);
+            padding: 14px 20px;
+            font-size: 0.8rem;
+            color: var(--text);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .pricing-right {
+            border: 1px solid var(--border-hi);
+            padding: 40px;
+            position: relative;
+        }
+
+        .pricing-right::before {
+            content: 'BEST VALUE';
+            position: absolute;
+            top: -11px;
+            right: 24px;
+            background: var(--lime);
+            color: var(--bg);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.2em;
+            padding: 2px 14px;
+        }
+
+        .pricing-amount {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 5rem;
+            line-height: 1;
+            letter-spacing: 0.02em;
+            color: var(--lime);
+            margin-bottom: 4px;
+        }
+
+        .pricing-note {
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--dim);
+            margin-bottom: 28px;
+        }
+
+        .pricing-includes {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+
+        .pricing-includes li {
+            font-size: 0.75rem;
+            color: var(--muted);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pricing-includes li:last-child { border-bottom: none; }
+
+        .pricing-includes li::before {
+            content: '✓';
+            color: var(--lime);
+            font-weight: 700;
+        }
+
+        /* ─── FAQ ─── */
+        .faq-section {
+            padding: 80px 0;
+        }
+
+        .faq-list {
+            margin-top: 48px;
+            border: 1px solid var(--border);
         }
 
         .faq-item {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            overflow: hidden;
+            border-bottom: 1px solid var(--border);
         }
 
-        .faq-question {
-            padding: 24px;
+        .faq-item:last-child { border-bottom: none; }
+
+        .faq-q {
+            padding: 20px 24px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.875rem;
             font-weight: 600;
-            font-size: 1.125rem;
-            transition: background 0.3s ease;
+            color: var(--text);
+            transition: background 0.2s;
+            user-select: none;
         }
 
-        .faq-question:hover {
-            background: var(--bg-primary);
+        .faq-q:hover { background: var(--bg-raised); }
+
+        .faq-q .faq-icon {
+            font-size: 1rem;
+            color: var(--lime);
+            transition: transform 0.3s;
+            flex-shrink: 0;
+            margin-left: 16px;
         }
 
-        .faq-answer {
-            padding: 0 24px 24px;
-            color: var(--text-secondary);
-            display: none;
+        .faq-item.open .faq-icon { transform: rotate(45deg); }
+        .faq-item.open .faq-q { background: var(--bg-raised); }
+
+        .faq-a {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
         }
 
-        .faq-item.active .faq-answer {
-            display: block;
+        .faq-a-inner {
+            padding: 0 24px 20px;
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.8;
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
         }
 
-        .faq-item.active .faq-question {
-            background: var(--bg-primary);
+        /* ─── GUARANTEE ─── */
+        .guarantee-section {
+            padding: 60px 0;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
         }
 
-        /* Guarantee Section */
-        .guarantee {
-            padding: 80px 0;
-            text-align: center;
+        .guarantee-inner {
+            display: flex;
+            align-items: center;
+            gap: 40px;
         }
 
         .guarantee-badge {
-            display: inline-flex;
+            flex-shrink: 0;
+            width: 100px;
+            height: 100px;
+            border: 2px solid var(--green);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 12px;
-            background: var(--bg-tertiary);
-            border: 2px solid var(--success-green);
-            border-radius: 12px;
-            padding: 24px 40px;
-            margin-bottom: 24px;
-        }
-
-        .guarantee-badge span {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--success-green);
-        }
-
-        /* Final CTA */
-        .final-cta {
-            padding: 80px 0 100px;
+            justify-content: center;
             text-align: center;
+        }
+
+        .guarantee-badge .days {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            color: var(--green);
+            line-height: 1;
+            letter-spacing: 0.05em;
+        }
+
+        .guarantee-badge .day-label {
+            font-size: 0.55rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--green);
+        }
+
+        .guarantee-text h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .guarantee-text p {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        /* ─── FINAL CTA ─── */
+        .final-cta {
+            padding: 80px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .final-cta-glow {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(200,240,61,0.04) 0%, transparent 70%);
+            pointer-events: none;
         }
 
         .final-cta h2 {
-            font-size: 2rem;
-            margin-bottom: 32px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            letter-spacing: 0.04em;
+            line-height: 1;
+            color: var(--text);
+            margin-bottom: 8px;
         }
 
-        /* Footer */
+        .final-cta h2 span { color: var(--lime); }
+
+        .final-cta p {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 40px;
+            line-height: 1.7;
+        }
+
+        /* ─── FOOTER ─── */
         footer {
-            padding: 40px 0;
-            border-top: 1px solid var(--border-color);
-            text-align: center;
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
         }
 
-        footer p {
-            color: var(--text-muted);
-            font-size: 0.875rem;
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        footer a {
-            color: var(--accent-purple);
+        .footer-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.25rem;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--dim);
             text-decoration: none;
+            transition: color 0.2s;
         }
 
-        /* Responsive */
+        .footer-links a:hover { color: var(--muted); }
+
+        .footer-copy {
+            font-size: 0.65rem;
+            color: var(--dim);
+            letter-spacing: 0.05em;
+        }
+
+        /* ─── RESPONSIVE ─── */
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .hero-stats {
-                flex-direction: column;
-                gap: 24px;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .price-tag {
-                font-size: 3rem;
-            }
-
-            .pricing-card {
-                padding: 32px;
-            }
+            .hero-body { grid-template-columns: 1fr; gap: 40px; }
+            .products-grid { grid-template-columns: 1fr; }
+            .chapters-grid { grid-template-columns: 1fr; }
+            .pricing-inner { grid-template-columns: 1fr; }
+            .header-nav { display: none; }
+            .footer-inner { flex-direction: column; gap: 20px; text-align: center; }
+            .guarantee-inner { flex-direction: column; text-align: center; }
         }
+
+        /* ─── ANIMATIONS ─── */
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            opacity: 0;
+            animation: fade-up 0.6s ease forwards;
+        }
+
+        .animate-in:nth-child(1) { animation-delay: 0.1s; }
+        .animate-in:nth-child(2) { animation-delay: 0.2s; }
+        .animate-in:nth-child(3) { animation-delay: 0.3s; }
+        .animate-in:nth-child(4) { animation-delay: 0.4s; }
     </style>
 </head>
 <body>
-    <!-- Header -->
+
+    <!-- ─── HEADER ─── -->
     <header>
         <div class="container">
-            <div class="header-content">
-                <div class="logo">polysauce.xyz</div>
-                <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="cta-button">Buy Now - $65</a>
+            <div class="header-inner">
+                <a href="/" class="logo">POLY<span class="logo-dot">.</span>SAUCE</a>
+                <nav class="header-nav">
+                    <a href="#leaderboard" class="nav-link">Leaderboard</a>
+                    <a href="#products" class="nav-link">Products</a>
+                    <a href="#pricing" class="nav-link">Pricing</a>
+                    <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="btn-primary">Buy Now — $65</a>
+                </nav>
             </div>
         </div>
     </header>
 
-    <!-- Hero Section -->
+    <!-- ─── HERO ─── -->
     <section class="hero">
+        <div class="hero-glow"></div>
         <div class="container">
-            <div class="hero-content">
-                <h1>Find the Best Polymarket Traders — Copy Them Automatically</h1>
-                <p class="subtitle">Multiple wallets are trading <strong>100% win rates</strong> (150/150 trades). Higher win rate = less downside risk. We track them so you can copy them.</p>
+            <div class="terminal-prompt">POLYMARKET_INTEL v2.1 — LIVE DATA FEED<span class="cursor"></span></div>
 
-                <div class="hero-stats">
-                    <div class="stat">
-                        <div class="stat-value">23</div>
-                        <div class="stat-label">Wallets at 90%+ win rate</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-value">100%</div>
-                        <div class="stat-label">Best trader win rate</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-value">$47K+</div>
-                        <div class="stat-label">Weekly combined profits</div>
+            <h1 class="animate-in">
+                COPY THE BEST
+                <span class="highlight">PREDICTION TRADERS.</span>
+                AUTOMATICALLY.
+            </h1>
+
+            <div class="hero-body">
+                <div class="hero-left animate-in">
+                    <p class="hero-sub">
+                        Multiple wallets are trading at <strong>100% win rates</strong>.
+                        We track every trade on Polymarket and rank traders by win rate —
+                        giving you the exact targets to copy.
+                        <br><br>
+                        Higher win rate = less downside risk.
+                        Our bot executes the copy trades for you, automatically.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="btn-primary large">Get the Masterclass — $65</a>
+                        <a href="/leaderboard/" class="btn-secondary">View Live Leaderboard</a>
                     </div>
                 </div>
 
-                <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="cta-button" style="padding: 16px 40px; font-size: 1.125rem;">Get the Guide - $65</a>
+                <div class="hero-right animate-in">
+                    <div class="stat-block">
+                        <div class="stat-block-header">Live Stats — Updated Daily</div>
+                        <div class="stat-grid">
+                            <div class="stat-cell">
+                                <div class="stat-val" data-count="9">9</div>
+                                <div class="stat-lbl">Wallets at 90%+ win rate</div>
+                            </div>
+                            <div class="stat-cell">
+                                <div class="stat-val green" data-prefix="$" data-count="150200" data-suffix="K">$150K</div>
+                                <div class="stat-lbl">Weekly combined profits</div>
+                            </div>
+                            <div class="stat-cell">
+                                <div class="stat-val orange" data-suffix="%">98</div>
+                                <div class="stat-lbl">Top trader win rate</div>
+                            </div>
+                            <div class="stat-cell">
+                                <div class="stat-val" data-count="634">634</div>
+                                <div class="stat-lbl">Trades analyzed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Leaderboard Preview -->
-    <section class="leaderboard-preview">
-        <div class="container">
-            <div class="section-header">
-                <h2>🎯 Live Win Rate Leaderboard</h2>
-                <p>The absolute best traders on Polymarket — higher win rate = less downside risk</p>
-            </div>
+    <!-- ─── TICKER ─── -->
+    <div class="ticker">
+        <div class="ticker-track">
+            <span class="ticker-item">TRADER_0x4a2f <span class="up">98.0%</span> WIN RATE <span class="ticker-sep">·</span></span>
+            <span class="ticker-item">WEEKLY PNL <span class="up">+$150.2K</span> COMBINED <span class="ticker-sep">·</span></span>
+            <span class="ticker-item">TRADER_0xbb91 <span class="up">95.6%</span> WIN RATE <span class="ticker-sep">·</span></span>
+            <span class="ticker-item">9 WALLETS <span class="up">90%+</span> WIN RATE <span class="ticker-sep">·</span></span>
+            <span class="ticker-item">TRADER_0xc73e <span class="up">94.5%</span> WIN RATE <span class="ticker-sep">·</span></span>
+            <span class="ticker-item">BOT SETUP TIME <span class="up">30 MIN</span> OR LESS <span class="ticker-sep">·</span></span>
+            <span class="ticker-item">634 TRADES ANALYZED <span class="up">THIS WEEK</span> <span class="ticker-sep">·</span></span>
+            <span class="ticker-item">TRADER_0x9d11 <span class="up">92.6%</span> WIN RATE <span class="ticker-sep">·</span></span>
+            <!-- Repeat for seamless loop -->
+            <span class="ticker-item">TRADER_0x4a2f <span class="up">98.0%</span> WIN RATE <span class="ticker-sep">·</span></span>
+            <span class="ticker-item">WEEKLY PNL <span class="up">+$150.2K</span> COMBINED <span class="ticker-sep">·</span></span>
+            <span class="ticker-item">TRADER_0xbb91 <span class="up">95.6%</span> WIN RATE <span class="ticker-sep">·</span></span>
+            <span class="ticker-item">9 WALLETS <span class="up">90%+</span> WIN RATE <span class="ticker-sep">·</span></span>
+            <span class="ticker-item">TRADER_0xc73e <span class="up">94.5%</span> WIN RATE <span class="ticker-sep">·</span></span>
+            <span class="ticker-item">BOT SETUP TIME <span class="up">30 MIN</span> OR LESS <span class="ticker-sep">·</span></span>
+            <span class="ticker-item">634 TRADES ANALYZED <span class="up">THIS WEEK</span> <span class="ticker-sep">·</span></span>
+            <span class="ticker-item">TRADER_0x9d11 <span class="up">92.6%</span> WIN RATE <span class="ticker-sep">·</span></span>
+        </div>
+    </div>
 
-            <div class="leaderboard-container">
-                <table class="leaderboard-table">
+    <!-- ─── LEADERBOARD PREVIEW ─── -->
+    <section class="leaderboard-section" id="leaderboard">
+        <div class="container">
+            <div class="section-label">Win Rate Intelligence</div>
+            <h2 class="section-title">THE ALPHA LEADERBOARD</h2>
+            <p class="section-desc">
+                Every trader ranked by win rate across all crypto prediction markets.
+                Higher win rate = higher confidence copy target.
+            </p>
+
+            <div class="lb-wrapper">
+                <div class="lb-header">
+                    <span class="lb-title">Polymarket // Crypto Markets // Top Traders by Win Rate</span>
+                    <span class="lb-live">Live</span>
+                </div>
+                <table class="lb-table">
                     <thead>
                         <tr>
-                            <th>Rank</th>
-                            <th>Trader</th>
+                            <th>#</th>
+                            <th>Trader Address</th>
                             <th>Win Rate</th>
                             <th>W/T</th>
-                            <th>PnL</th>
+                            <th>7D PnL</th>
+                            <th>Volume</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="blurred-row">
-                            <td>1</td>
-                            <td class="blurred">███████████</td>
-                            <td class="win-rate">94.2%</td>
-                            <td>47/50</td>
-                            <td class="positive">+$12,847</td>
+                        <tr class="rank-1">
+                            <td class="rank-num">01</td>
+                            <td><span class="trader-addr blurred">0x4a2f...c8d1</span></td>
+                            <td>
+                                <div class="wr-bar-wrap">
+                                    <span class="wr wr-90">98.0%</span>
+                                    <div class="wr-bar-track"><div class="wr-bar-fill" style="width: 98%"></div></div>
+                                </div>
+                            </td>
+                            <td>21/22</td>
+                            <td class="pnl-pos">+$9,094</td>
+                            <td class="vol-cell">$84.8K</td>
                         </tr>
-                        <tr class="blurred-row">
-                            <td>2</td>
-                            <td class="blurred">███████████</td>
-                            <td class="win-rate">91.8%</td>
-                            <td>45/49</td>
-                            <td class="positive">+$9,234</td>
+                        <tr class="rank-2">
+                            <td class="rank-num">02</td>
+                            <td><span class="trader-addr blurred">0xbb91...f432</span></td>
+                            <td>
+                                <div class="wr-bar-wrap">
+                                    <span class="wr wr-90">98.0%</span>
+                                    <div class="wr-bar-track"><div class="wr-bar-fill" style="width: 98%"></div></div>
+                                </div>
+                            </td>
+                            <td>35/36</td>
+                            <td class="pnl-pos">+$7,216</td>
+                            <td class="vol-cell">$16.7K</td>
                         </tr>
-                        <tr class="blurred-row">
-                            <td>3</td>
-                            <td class="blurred">███████████</td>
-                            <td class="win-rate">90.4%</td>
-                            <td>38/42</td>
-                            <td class="positive">+$7,891</td>
-                        </tr>
-                        <tr class="blurred-row">
-                            <td>4</td>
-                            <td class="blurred">███████████</td>
-                            <td class="win-rate">89.1%</td>
-                            <td>41/46</td>
-                            <td class="positive">+$6,543</td>
-                        </tr>
-                        <tr class="blurred-row">
-                            <td>5</td>
-                            <td class="blurred">███████████</td>
-                            <td class="win-rate">87.6%</td>
-                            <td>36/41</td>
-                            <td class="positive">+$5,218</td>
-                        </tr>
-                        <tr class="blurred-row">
-                            <td>6</td>
-                            <td class="blurred">███████████</td>
-                            <td class="win-rate">86.3%</td>
-                            <td>32/37</td>
-                            <td class="positive">+$4,102</td>
-                        </tr>
-                        <tr class="blurred-row">
-                            <td>7</td>
-                            <td class="blurred">███████████</td>
-                            <td class="win-rate">84.9%</td>
-                            <td>28/33</td>
-                            <td class="positive">+$3,876</td>
-                        </tr>
-                        <tr class="blurred-row">
-                            <td>8</td>
-                            <td class="blurred">███████████</td>
-                            <td class="win-rate">83.5%</td>
-                            <td>25/30</td>
-                            <td class="positive">+$2,945</td>
+                        <tr class="rank-3">
+                            <td class="rank-num">03</td>
+                            <td><span class="trader-addr blurred">0x77ae...2901</span></td>
+                            <td>
+                                <div class="wr-bar-wrap">
+                                    <span class="wr wr-90">95.6%</span>
+                                    <div class="wr-bar-track"><div class="wr-bar-fill" style="width: 95.6%"></div></div>
+                                </div>
+                            </td>
+                            <td>20/21</td>
+                            <td class="pnl-pos">+$2,672</td>
+                            <td class="vol-cell">$60.1K</td>
                         </tr>
                         <tr>
-                            <td>9</td>
-                            <td>CryptoKing_42</td>
-                            <td class="win-rate">76.2%</td>
-                            <td>22/29</td>
-                            <td class="positive">+$1,234</td>
+                            <td class="rank-num">04</td>
+                            <td><span class="trader-addr blurred">0xc73e...8b44</span></td>
+                            <td>
+                                <div class="wr-bar-wrap">
+                                    <span class="wr wr-90">94.5%</span>
+                                    <div class="wr-bar-track"><div class="wr-bar-fill" style="width: 94.5%"></div></div>
+                                </div>
+                            </td>
+                            <td>39/42</td>
+                            <td class="pnl-pos">+$9,246</td>
+                            <td class="vol-cell">$29.8K</td>
                         </tr>
                         <tr>
-                            <td>10</td>
-                            <td>PolymarketPro</td>
-                            <td class="win-rate">74.8%</td>
-                            <td>20/27</td>
-                            <td class="positive">+$987</td>
+                            <td class="rank-num">05</td>
+                            <td><span class="trader-addr blurred">0x1d50...aa77</span></td>
+                            <td>
+                                <div class="wr-bar-wrap">
+                                    <span class="wr wr-90">93.6%</span>
+                                    <div class="wr-bar-track"><div class="wr-bar-fill" style="width: 93.6%"></div></div>
+                                </div>
+                            </td>
+                            <td>25/27</td>
+                            <td class="pnl-pos">+$4,281</td>
+                            <td class="vol-cell">$50.4K</td>
+                        </tr>
+                        <tr>
+                            <td class="rank-num">06</td>
+                            <td><span class="trader-addr blurred">0x9d11...3f9c</span></td>
+                            <td>
+                                <div class="wr-bar-wrap">
+                                    <span class="wr wr-90">92.6%</span>
+                                    <div class="wr-bar-track"><div class="wr-bar-fill" style="width: 92.6%"></div></div>
+                                </div>
+                            </td>
+                            <td>26/29</td>
+                            <td class="pnl-pos">+$7,596</td>
+                            <td class="vol-cell">$64.0K</td>
                         </tr>
                     </tbody>
                 </table>
 
-                <!-- Paywall Overlay -->
-                <div class="paywall-overlay">
-                    <div class="paywall-content">
-                        <div class="paywall-stat">
-                            <span class="paywall-number">23</span>
-                            <span class="paywall-label">wallets trading at 90%+ win rate</span>
+                <!-- Paywall -->
+                <div class="lb-paywall">
+                    <div class="lb-paywall-box">
+                        <div class="lb-paywall-stats">
+                            <div>
+                                <span class="lp-stat-val">20</span>
+                                <span class="lp-stat-lbl">Traders tracked</span>
+                            </div>
+                            <div>
+                                <span class="lp-stat-val">$150K</span>
+                                <span class="lp-stat-lbl">Weekly profits</span>
+                            </div>
+                            <div>
+                                <span class="lp-stat-val">98%</span>
+                                <span class="lp-stat-lbl">Top win rate</span>
+                            </div>
                         </div>
-                        <div class="paywall-stat">
-                            <span class="paywall-number">$47K+</span>
-                            <span class="paywall-label">combined weekly profits</span>
-                        </div>
-                        <p class="paywall-text">Unlock full leaderboard access + bot setup guide</p>
-                        <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="cta-button">Get the Guide - $65</a>
+                        <p class="lb-paywall-text">Full wallet addresses + bot setup guide included with purchase. One trade can pay for this entire guide.</p>
+                        <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="btn-primary">Unlock Full Access — $65</a>
                     </div>
                 </div>
             </div>
 
-            <p class="leaderboard-note">Data updated daily from Polymarket crypto markets (last 7 days)</p>
+            <p class="lb-note">// Data updated daily from Polymarket on-chain records · crypto markets only · last 7 days</p>
         </div>
     </section>
 
-    <!-- What You Get -->
-    <section class="what-you-get">
+    <!-- ─── PRODUCTS ─── -->
+    <section class="products-section" id="products">
         <div class="container">
-            <div class="section-header">
-                <h2>What You'll Learn</h2>
-                <p>A complete guide to building and running your own copy trading bot</p>
-            </div>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>Polymarket Fundamentals</h3>
-                    <p>Understand prediction markets, how Polymarket works, and why they're profitable for informed traders.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Copy Trading Strategy</h3>
-                    <p>Learn how to identify top traders using the leaderboard and what makes a good copy target.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">🤖</div>
-                    <h3>Bot Setup Guide</h3>
-                    <p>Step-by-step instructions to build your bot. Every command is copy-pasteable.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">⚙️</div>
-                    <h3>Risk Management</h3>
-                    <p>Configure position sizing, limits, and safety rules. Start small and scale up safely.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">🔔</div>
-                    <h3>Monitoring & Operations</h3>
-                    <p>Keep your bot running smoothly, troubleshoot issues, and track performance.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">🤖</div>
-                    <h3>AI Agent Support</h3>
-                    <p>Hand this guide to Claude Code, OpenClaw, or Cursor. They'll set everything up for you.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Chapters -->
-    <section class="chapters-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>8 Comprehensive Chapters</h2>
-                <p>From basics to advanced operations</p>
-            </div>
-
-            <div class="chapters-list">
-                <div class="chapter-item">
-                    <div class="chapter-number">01</div>
-                    <div class="chapter-content">
-                        <h3>Polymarket 101</h3>
-                        <p>What are prediction markets, how Polymarket works, and creating your account</p>
-                    </div>
-                </div>
-
-                <div class="chapter-item">
-                    <div class="chapter-number">02</div>
-                    <div class="chapter-content">
-                        <h3>The Copy Trading Strategy</h3>
-                        <p>Why copy trading works, identifying top traders, and the math of expected value</p>
-                    </div>
-                </div>
-
-                <div class="chapter-item">
-                    <div class="chapter-number">03</div>
-                    <div class="chapter-content">
-                        <h3>Understanding the Leaderboard</h3>
-                        <p>Reading trader data, filtering markets, and tracking consistency over time</p>
-                    </div>
-                </div>
-
-                <div class="chapter-item">
-                    <div class="chapter-number">04</div>
-                    <div class="chapter-content">
-                        <h3>Setting Up Your Bot</h3>
-                        <p>Technical setup: prerequisites, wallet creation, configuration, and running the bot</p>
-                    </div>
-                </div>
-
-                <div class="chapter-item">
-                    <div class="chapter-number">05</div>
-                    <div class="chapter-content">
-                        <h3>Configuration & Risk Management</h3>
-                        <p>Sizing strategies, position limits, polling frequency, and stop rules</p>
-                    </div>
-                </div>
-
-                <div class="chapter-item">
-                    <div class="chapter-number">06</div>
-                    <div class="chapter-content">
-                        <h3>Advanced — Signal Integration</h3>
-                        <p>Optional: Add AI-powered signals from Grok, Gemini, and external data sources</p>
-                    </div>
-                </div>
-
-                <div class="chapter-item">
-                    <div class="chapter-number">07</div>
-                    <div class="chapter-content">
-                        <h3>Monitoring & Operations</h3>
-                        <p>Checking positions, reading bot logs, common errors, and running as background service</p>
-                    </div>
-                </div>
-
-                <div class="chapter-item">
-                    <div class="chapter-number">08</div>
-                    <div class="chapter-content">
-                        <h3>Giving This Guide to Your AI Agent</h3>
-                        <p>How to have Claude Code, OpenClaw, or Cursor set up everything automatically</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Pricing -->
-    <section class="pricing">
-        <div class="container">
-            <div class="pricing-card">
-                <h2>Complete Masterclass</h2>
-                <div class="price-tag">$65</div>
-                <p class="price-subtitle">One-time payment • Lifetime access</p>
-
-                <div class="value-statement">
-                    <p>One bot trade can pay for this entire guide</p>
-                </div>
-
-                <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="cta-button pricing-cta">Buy Now</a>
-
-                <p style="margin-top: 24px; color: var(--text-muted); font-size: 0.875rem;">
-                    Instant digital delivery • PDF + Markdown formats
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="faq">
-        <div class="container">
-            <div class="section-header">
-                <h2>Frequently Asked Questions</h2>
-            </div>
-
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        Is this legal?
-                        <span>+</span>
-                    </div>
-                    <div class="faq-answer">
-                        Yes. Prediction markets like Polymarket operate legally in many jurisdictions. However, regulations vary by country. Check your local laws before participating. This guide is for educational purposes.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        Do I need coding experience?
-                        <span>+</span>
-                    </div>
-                    <div class="faq-answer">
-                        No. The guide provides copy-paste commands for every step. If you can run terminal commands, you can set up the bot. Alternatively, you can give this guide to an AI agent (Claude Code, OpenClaw, Cursor) and it will handle everything.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        How much capital do I need?
-                        <span>+</span>
-                    </div>
-                    <div class="faq-answer">
-                        You can start with as little as $100 in USDC. However, $500-1,000 is recommended for meaningful position sizing. The guide includes a sizing progression to help you scale up safely.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        What's the expected return?
-                        <span>+</span>
-                    </div>
-                    <div class="faq-answer">
-                        Returns depend on your target trader and market conditions. Top Polymarket traders achieve 60%+ win rates. Past performance doesn't guarantee future results. Start small and track your results.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        Is this a one-time payment?
-                        <span>+</span>
-                    </div>
-                    <div class="faq-answer">
-                        Yes. $65 one-time payment. You get lifetime access to the guide, including any future updates. No subscriptions, no hidden fees.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        Can I get a refund?
-                        <span>+</span>
-                    </div>
-                    <div class="faq-answer">
-                        Yes. If you're not satisfied within 30 days, email us for a full refund. No questions asked.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        What format is the guide in?
-                        <span>+</span>
-                    </div>
-                    <div class="faq-answer">
-                        You'll receive the guide in Markdown (.md) format, which can be viewed as text, converted to PDF, or opened in any markdown reader. It's also optimized for AI agents to read and execute.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        How long does setup take?
-                        <span>+</span>
-                    </div>
-                    <div class="faq-answer">
-                        The Quick Start section gets you running in 30 minutes. The full guide takes 1-2 hours to read and understand. If you use an AI agent, setup can be fully automated in 5-10 minutes.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Guarantee -->
-    <section class="guarantee">
-        <div class="container">
-            <div class="guarantee-badge">
-                <span>🛡️ 30-Day Money-Back Guarantee</span>
-            </div>
-            <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
-                Not satisfied? Get a full refund within 30 days. No questions asked.
+            <div class="section-label">What You're Getting</div>
+            <h2 class="section-title">TWO WEAPONS.</h2>
+            <p class="section-desc">
+                The leaderboard tells you who to copy. The bot does the copying.
+                The masterclass teaches you how it all works.
             </p>
+
+            <div class="products-grid">
+                <div class="product-card">
+                    <span class="product-tag">Included</span>
+                    <h3>Copy Trade Bot</h3>
+                    <p>
+                        An automated bot that monitors your target traders and mirrors their
+                        positions on Polymarket. Copy-paste setup commands — no coding required.
+                        AI-agent compatible.
+                    </p>
+                    <ul class="product-features">
+                        <li>Automated position mirroring</li>
+                        <li>Configurable position sizing & limits</li>
+                        <li>Real-time monitoring via logs</li>
+                        <li>Risk management rules built-in</li>
+                        <li>30-min setup with copy-paste commands</li>
+                        <li>Works with Claude Code, Cursor, or OpenClaw</li>
+                    </ul>
+                </div>
+
+                <div class="product-card">
+                    <span class="product-tag orange">Included</span>
+                    <h3>Masterclass Guide</h3>
+                    <p>
+                        8 comprehensive chapters covering everything from Polymarket fundamentals
+                        to advanced AI signal integration. The definitive manual for prediction
+                        market copy trading.
+                    </p>
+                    <ul class="product-features">
+                        <li>Polymarket 101 — how prediction markets work</li>
+                        <li>Reading and using the win rate leaderboard</li>
+                        <li>Bot setup walkthrough step-by-step</li>
+                        <li>Position sizing & risk management chapter</li>
+                        <li>Advanced: AI signal integration (Grok, Gemini)</li>
+                        <li>Optimized for AI agent execution</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Final CTA -->
-    <section class="final-cta">
+    <!-- ─── CHAPTERS ─── -->
+    <section class="chapters-section" id="chapters">
         <div class="container">
-            <h2>Ready to Automate Your Polymarket Trading?</h2>
-            <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="cta-button" style="padding: 16px 40px; font-size: 1.125rem;">Get the Guide - $65</a>
+            <div class="section-label">Masterclass Contents</div>
+            <h2 class="section-title">8 CHAPTERS.</h2>
+
+            <div class="chapters-grid">
+                <div class="chapter-item">
+                    <div class="ch-num">01</div>
+                    <div class="ch-content">
+                        <h3>Polymarket 101</h3>
+                        <p>What are prediction markets, how Polymarket works, creating your account and first deposit.</p>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <div class="ch-num">02</div>
+                    <div class="ch-content">
+                        <h3>The Copy Trading Strategy</h3>
+                        <p>Why copy trading works on Polymarket, identifying top traders, the math of expected value.</p>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <div class="ch-num">03</div>
+                    <div class="ch-content">
+                        <h3>Understanding the Leaderboard</h3>
+                        <p>Reading trader data, filtering for crypto markets, and tracking consistency over time.</p>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <div class="ch-num">04</div>
+                    <div class="ch-content">
+                        <h3>Setting Up Your Bot</h3>
+                        <p>Technical setup: prerequisites, wallet creation, configuration, running the bot.</p>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <div class="ch-num">05</div>
+                    <div class="ch-content">
+                        <h3>Configuration & Risk Management</h3>
+                        <p>Sizing strategies, position limits, polling frequency, stop rules, scaling up safely.</p>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <div class="ch-num">06</div>
+                    <div class="ch-content">
+                        <h3>Advanced — Signal Integration</h3>
+                        <p>Optional: Add AI-powered signals from Grok, Gemini, and external data sources.</p>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <div class="ch-num">07</div>
+                    <div class="ch-content">
+                        <h3>Monitoring & Operations</h3>
+                        <p>Checking positions, reading bot logs, common errors, running as a background service.</p>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <div class="ch-num">08</div>
+                    <div class="ch-content">
+                        <h3>Give This Guide to Your AI Agent</h3>
+                        <p>Have Claude Code, Cursor, or OpenClaw execute everything automatically in 5–10 minutes.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- ─── PRICING ─── -->
+    <section class="pricing-section" id="pricing">
+        <div class="container">
+            <div class="section-label">Pricing</div>
+
+            <div class="pricing-inner">
+                <div class="pricing-left">
+                    <h2>ONE PRICE.<br><span>EVERYTHING.</span></h2>
+                    <p>
+                        No subscription. No hidden fees. No upsells. One $65 payment gets you
+                        lifetime access to the guide, full leaderboard access, bot setup instructions,
+                        and any future updates.
+                    </p>
+                    <div class="value-line">
+                        "One bot trade can cover this entire guide. The top traders are doing
+                        $9K–$15K in weekly PnL."
+                    </div>
+                    <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="btn-primary large">Buy Now — $65</a>
+                </div>
+
+                <div class="pricing-right">
+                    <div class="pricing-amount">$65</div>
+                    <div class="pricing-note">One-time payment · Lifetime access</div>
+                    <ul class="pricing-includes">
+                        <li>Full win rate leaderboard (20 traders)</li>
+                        <li>Complete wallet addresses — unblurred</li>
+                        <li>Copy trade bot setup guide</li>
+                        <li>8-chapter masterclass (PDF + Markdown)</li>
+                        <li>AI-agent optimized format</li>
+                        <li>Advanced signal integration chapter</li>
+                        <li>Risk management playbook</li>
+                        <li>All future updates included</li>
+                        <li>30-day money-back guarantee</li>
+                    </ul>
+                    <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="btn-primary" style="width: 100%; text-align: center; display: block;">Get Instant Access</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── FAQ ─── -->
+    <section class="faq-section" id="faq">
+        <div class="container">
+            <div class="section-label">FAQ</div>
+            <h2 class="section-title">QUESTIONS.</h2>
+
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-q">Is this legal? <span class="faq-icon">+</span></div>
+                    <div class="faq-a">
+                        <div class="faq-a-inner">
+                            Yes. Prediction markets like Polymarket operate legally in many jurisdictions. Regulations vary by country — check your local laws before participating. This guide is for educational purposes.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">Do I need coding experience? <span class="faq-icon">+</span></div>
+                    <div class="faq-a">
+                        <div class="faq-a-inner">
+                            No. Every step has copy-paste commands. If you can run terminal commands, you can set up the bot. Alternatively, hand the guide to Claude Code, OpenClaw, or Cursor and it will handle everything automatically.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">How much capital do I need to start? <span class="faq-icon">+</span></div>
+                    <div class="faq-a">
+                        <div class="faq-a-inner">
+                            You can start with as little as $100 in USDC. $500–1,000 is recommended for meaningful position sizing. The guide includes a sizing progression to help you scale up safely.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">What's the expected return? <span class="faq-icon">+</span></div>
+                    <div class="faq-a">
+                        <div class="faq-a-inner">
+                            Returns depend on your target trader and market conditions. Top Polymarket traders are achieving 90%+ win rates. Past performance doesn't guarantee future results. Start small, track your results, scale up gradually.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">How long does setup take? <span class="faq-icon">+</span></div>
+                    <div class="faq-a">
+                        <div class="faq-a-inner">
+                            The Quick Start section gets you running in 30 minutes. Full guide takes 1–2 hours to read. If you use an AI agent, setup can be fully automated in 5–10 minutes.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">What format is the guide in? <span class="faq-icon">+</span></div>
+                    <div class="faq-a">
+                        <div class="faq-a-inner">
+                            Markdown (.md) format — viewable as plain text, convertible to PDF, or openable in any markdown reader. Also optimized for AI agents to read and execute directly.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q">Can I get a refund? <span class="faq-icon">+</span></div>
+                    <div class="faq-a">
+                        <div class="faq-a-inner">
+                            Yes. 30-day money-back guarantee. If you're not satisfied, email for a full refund. No questions asked.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── GUARANTEE ─── -->
+    <section class="guarantee-section">
+        <div class="container">
+            <div class="guarantee-inner">
+                <div class="guarantee-badge">
+                    <span class="days">30</span>
+                    <span class="day-label">Day<br>Guarantee</span>
+                </div>
+                <div class="guarantee-text">
+                    <h3>Money-Back Guarantee</h3>
+                    <p>
+                        Not satisfied within 30 days? Full refund, no questions asked.
+                        We're confident in the quality of this guide — but if it doesn't
+                        deliver what we promise, you pay nothing.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── FINAL CTA ─── -->
+    <section class="final-cta">
+        <div class="final-cta-glow"></div>
+        <div class="container">
+            <h2>READY TO RUN THE<br><span>ALPHA BOT?</span></h2>
+            <p>Join the traders who stopped guessing and started copying the best.</p>
+            <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="btn-primary large">Get the Masterclass — $65</a>
+        </div>
+    </section>
+
+    <!-- ─── FOOTER ─── -->
     <footer>
         <div class="container">
-            <p>By <a href="https://vibestak.com" target="_blank">vibestak</a> — Building autonomous businesses</p>
-            <p style="margin-top: 12px;">&copy; 2025 All rights reserved</p>
+            <div class="footer-inner">
+                <span class="footer-logo">POLYSAUCE.XYZ</span>
+                <div class="footer-links">
+                    <a href="/leaderboard/">Leaderboard</a>
+                    <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00">Buy</a>
+                    <a href="https://vibestak.com" target="_blank">vibestak</a>
+                </div>
+                <span class="footer-copy">© 2025 All rights reserved</span>
+            </div>
         </div>
     </footer>
 
     <script>
-        // FAQ Toggle
-        document.querySelectorAll('.faq-question').forEach(button => {
-            button.addEventListener('click', () => {
-                const faqItem = button.parentElement;
-                const isActive = faqItem.classList.contains('active');
+        // FAQ accordion
+        document.querySelectorAll('.faq-q').forEach(q => {
+            q.addEventListener('click', () => {
+                const item = q.parentElement;
+                const answer = item.querySelector('.faq-a');
+                const isOpen = item.classList.contains('open');
 
-                // Close all FAQ items
-                document.querySelectorAll('.faq-item').forEach(item => {
-                    item.classList.remove('active');
+                document.querySelectorAll('.faq-item').forEach(i => {
+                    i.classList.remove('open');
+                    i.querySelector('.faq-a').style.maxHeight = null;
                 });
 
-                // Open clicked item if it wasn't active
-                if (!isActive) {
-                    faqItem.classList.add('active');
+                if (!isOpen) {
+                    item.classList.add('open');
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
                 }
             });
         });
 
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth'
-                    });
+        // Count-up animation for stats
+        function countUp(el, target, prefix = '', suffix = '') {
+            const duration = 1800;
+            const start = performance.now();
+            const format = (n) => {
+                if (n >= 1000) return prefix + (n >= 100000 ? Math.round(n/1000) + 'K' : n.toLocaleString()) + suffix;
+                return prefix + Math.round(n) + suffix;
+            };
+
+            const step = (now) => {
+                const progress = Math.min((now - start) / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 3);
+                el.textContent = format(ease * target);
+                if (progress < 1) requestAnimationFrame(step);
+                else el.textContent = format(target);
+            };
+            requestAnimationFrame(step);
+        }
+
+        // Trigger count-up when stat block enters viewport
+        const statVals = document.querySelectorAll('[data-count]');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const target = parseFloat(el.dataset.count);
+                    const prefix = el.dataset.prefix || '';
+                    const suffix = el.dataset.suffix || '';
+                    countUp(el, target, prefix, suffix);
+                    observer.unobserve(el);
                 }
             });
+        }, { threshold: 0.3 });
+
+        statVals.forEach(el => observer.observe(el));
+
+        // Simple stat-val without data-count (static)
+        document.querySelectorAll('[data-suffix]:not([data-count])').forEach(el => {
+            const suffix = el.dataset.suffix || '';
+            el.textContent = el.textContent.includes(suffix) ? el.textContent : el.textContent + suffix;
         });
     </script>
 </body>
