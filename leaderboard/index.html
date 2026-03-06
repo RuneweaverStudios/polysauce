@@ -32,16 +32,9 @@
             padding: 24px;
         }
         
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
+        .container { max-width: 900px; margin: 0 auto; }
         
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 32px 0;
-        }
+        header { text-align: center; margin-bottom: 40px; padding: 32px 0; }
         
         h1 {
             font-family: 'Space Grotesk', sans-serif;
@@ -49,16 +42,9 @@
             margin-bottom: 12px;
         }
         
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 1rem;
-        }
+        .subtitle { color: var(--text-muted); font-size: 1rem; }
         
-        .updated {
-            color: var(--text-dim);
-            font-size: 0.8rem;
-            margin-top: 8px;
-        }
+        .updated { color: var(--text-dim); font-size: 0.8rem; margin-top: 8px; }
         
         .stats-bar {
             display: flex;
@@ -71,9 +57,7 @@
             border: 1px solid var(--border);
         }
         
-        .stat {
-            text-align: center;
-        }
+        .stat { text-align: center; }
         
         .stat-value {
             font-family: 'Space Grotesk', sans-serif;
@@ -82,29 +66,18 @@
             color: var(--accent);
         }
         
-        .stat-label {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            margin-top: 4px;
-        }
+        .stat-label { color: var(--text-muted); font-size: 0.8rem; margin-top: 4px; }
         
-        .table-container {
+        .table-container{
             background: var(--bg-card);
             border-radius: 16px;
             border: 1px solid var(--border);
             overflow: hidden;
         }
         
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-        }
+        table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
         
-        thead {
-            background: var(--bg);
-        }
+        thead { background: var(--bg); }
         
         th {
             padding: 16px 12px;
@@ -117,30 +90,15 @@
             border-bottom: 1px solid var(--border);
         }
         
-        td {
-            padding: 14px 12px;
-            border-bottom: 1px solid var(--border);
-        }
+        td { padding: 14px 12px; border-bottom: 1px solid var(--border); }
+        tr:last-child td { border-bottom: none; }
         
-        tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .rank {
-            font-weight: 600;
-            color: var(--text-muted);
-            min-width: 40px;
-        }
-        
+        .rank { font-weight: 600; color: var(--text-muted); min-width: 40px; }
         .rank-1 { color: #fbbf24; }
         .rank-2 { color: #9ca3af; }
         .rank-3 { color: #cd7f32; }
         
-        .trader {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .trader { display: flex; align-items: center; gap: 10px; }
         
         .avatar {
             width: 28px;
@@ -154,37 +112,21 @@
             font-weight: 600;
         }
         
-        .trader-name {
-            color: var(--text);
-        }
+        .trader-name { color: var(--text); }
+        .trader-name.blurred { color: var(--text-dim); filter: blur(5px); user-select: none; }
         
-        .trader-name.blurred {
-            color: var(--text-dim);
-            filter: blur(5px);
-            user-select: none;
-            pointer-events: none;
-        }
-        
-        .win-rate {
-            font-weight: 600;
-        }
-        
+        .win-rate { font-weight: 600; }
         .win-high { color: var(--green); }
         .win-mid { color: #eab308; }
         .win-low { color: var(--text-muted); }
         
         .pnl-positive { color: var(--green); }
         .pnl-negative { color: var(--red); }
+        .volume { color: var(--text-muted); }
         
-        .volume {
-            color: var(--text-muted);
-        }
+        .paywall-row { background: rgba(139, 92, 246, 0.05); }
         
-        .paywall-row {
-            background: rgba(139, 92, 246, 0.05);
-        }
-        
-        .cta-section {
+        .cta-section{
             text-align: center;
             margin-top: 40px;
             padding: 40px;
@@ -199,12 +141,9 @@
             margin-bottom: 16px;
         }
         
-        .cta-section p {
-            color: var(--text-muted);
-            margin-bottom: 24px;
-        }
+        .cta-section p { color: var(--text-muted); margin-bottom: 24px; }
         
-        .cta-button {
+        .cta-button{
             display: inline-block;
             background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
             color: white;
@@ -220,12 +159,7 @@
             box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
         }
         
-        .lock-icon {
-            display: inline-block;
-            margin-right: 8px;
-        }
-        
-        footer {
+        footer{
             text-align: center;
             margin-top: 40px;
             padding: 24px;
@@ -233,19 +167,11 @@
             font-size: 0.8rem;
         }
         
-        footer a {
-            color: var(--accent);
-            text-decoration: none;
-        }
+        footer a { color: var(--accent); text-decoration: none; }
         
         @media (max-width: 640px) {
-            .stats-bar {
-                flex-direction: column;
-                gap: 20px;
-            }
-            
+            .stats-bar { flex-direction: column; gap: 20px; }
             h1 { font-size: 1.5rem; }
-            
             table { font-size: 0.75rem; }
             td, th { padding: 10px 8px; }
         }
@@ -256,20 +182,20 @@
         <header>
             <h1>📈 Polymarket Crypto Leaderboard</h1>
             <p class="subtitle">Top traders ranked by win rate — crypto markets only</p>
-            <p class="updated">Last updated: March 5, 2026 · Next update in 18 hours</p>
+            <p class="updated">Last updated: March 5, 2026 · Next update in 24 hours</p>
         </header>
         
         <div class="stats-bar">
             <div class="stat">
-                <div class="stat-value">23</div>
+                <div class="stat-value">9</div>
                 <div class="stat-label">Wallets at 90%+ win rate</div>
             </div>
             <div class="stat">
-                <div class="stat-value">$47.2K</div>
+                <div class="stat-value">$150.2K</div>
                 <div class="stat-label">Combined weekly profits</div>
             </div>
             <div class="stat">
-                <div class="stat-value">1,247</div>
+                <div class="stat-value">634</div>
                 <div class="stat-label">Trades analyzed</div>
             </div>
         </div>
@@ -287,128 +213,232 @@
                     </tr>
                 </thead>
                 <tbody>
+                    
                     <tr class="paywall-row">
                         <td class="rank rank-1">1</td>
-                        <td><span class="trader-name blurred">████████████</span></td>
-                        <td class="win-rate win-high">94.2%</td>
-                        <td>47/50</td>
-                        <td class="pnl-positive">+$12,847</td>
-                        <td class="volume">$89,234</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-high">98.0%</td>
+                        <td>21/22</td>
+                        <td class="pnl-positive">+$9,094</td>
+                        <td class="volume">$84,787</td>
                     </tr>
+
                     <tr class="paywall-row">
                         <td class="rank rank-2">2</td>
-                        <td><span class="trader-name blurred">████████████</span></td>
-                        <td class="win-rate win-high">91.8%</td>
-                        <td>45/49</td>
-                        <td class="pnl-positive">+$9,234</td>
-                        <td class="volume">$72,891</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-high">98.0%</td>
+                        <td>35/36</td>
+                        <td class="pnl-positive">+$7,216</td>
+                        <td class="volume">$16,681</td>
                     </tr>
+
                     <tr class="paywall-row">
                         <td class="rank rank-3">3</td>
-                        <td><span class="trader-name blurred">████████████</span></td>
-                        <td class="win-rate win-high">90.4%</td>
-                        <td>38/42</td>
-                        <td class="pnl-positive">+$7,891</td>
-                        <td class="volume">$61,432</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-high">95.6%</td>
+                        <td>20/21</td>
+                        <td class="pnl-positive">+$2,672</td>
+                        <td class="volume">$60,119</td>
                     </tr>
+
                     <tr class="paywall-row">
-                        <td class="rank">4</td>
-                        <td><span class="trader-name blurred">████████████</span></td>
-                        <td class="win-rate win-high">89.1%</td>
-                        <td>41/46</td>
-                        <td class="pnl-positive">+$6,543</td>
-                        <td class="volume">$54,218</td>
+                        <td class="rank ">4</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-high">94.5%</td>
+                        <td>39/42</td>
+                        <td class="pnl-positive">+$9,246</td>
+                        <td class="volume">$29,806</td>
                     </tr>
+
                     <tr class="paywall-row">
-                        <td class="rank">5</td>
-                        <td><span class="trader-name blurred">████████████</span></td>
-                        <td class="win-rate win-high">87.6%</td>
+                        <td class="rank ">5</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-high">93.6%</td>
+                        <td>25/27</td>
+                        <td class="pnl-positive">+$4,281</td>
+                        <td class="volume">$50,447</td>
+                    </tr>
+
+                    <tr class="paywall-row">
+                        <td class="rank ">6</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-high">93.2%</td>
+                        <td>27/29</td>
+                        <td class="pnl-positive">+$8,345</td>
+                        <td class="volume">$73,840</td>
+                    </tr>
+
+                    <tr class="paywall-row">
+                        <td class="rank ">7</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-high">92.6%</td>
+                        <td>26/29</td>
+                        <td class="pnl-positive">+$7,596</td>
+                        <td class="volume">$64,027</td>
+                    </tr>
+
+                    <tr class="paywall-row">
+                        <td class="rank ">8</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-high">91.3%</td>
+                        <td>44/49</td>
+                        <td class="pnl-positive">+$12,321</td>
+                        <td class="volume">$17,675</td>
+                    </tr>
+
+                    <tr class="paywall-row">
+                        <td class="rank ">9</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-high">90.5%</td>
+                        <td>26/29</td>
+                        <td class="pnl-positive">+$9,220</td>
+                        <td class="volume">$81,479</td>
+                    </tr>
+
+                    <tr class="paywall-row">
+                        <td class="rank ">10</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-high">89.5%</td>
                         <td>36/41</td>
-                        <td class="pnl-positive">+$5,218</td>
-                        <td class="volume">$48,765</td>
+                        <td class="pnl-positive">+$4,459</td>
+                        <td class="volume">$91,816</td>
                     </tr>
+
                     <tr class="paywall-row">
-                        <td class="rank">6</td>
-                        <td><span class="trader-name blurred">████████████</span></td>
-                        <td class="win-rate win-high">86.3%</td>
-                        <td>32/37</td>
-                        <td class="pnl-positive">+$4,102</td>
-                        <td class="volume">$42,891</td>
-                    </tr>
-                    <tr class="paywall-row">
-                        <td class="rank">7</td>
-                        <td><span class="trader-name blurred">████████████</span></td>
-                        <td class="win-rate win-high">84.9%</td>
-                        <td>28/33</td>
-                        <td class="pnl-positive">+$3,876</td>
-                        <td class="volume">$38,432</td>
-                    </tr>
-                    <tr class="paywall-row">
-                        <td class="rank">8</td>
-                        <td><span class="trader-name blurred">████████████</span></td>
-                        <td class="win-rate win-high">83.5%</td>
-                        <td>25/30</td>
-                        <td class="pnl-positive">+$2,945</td>
-                        <td class="volume">$31,654</td>
-                    </tr>
-                    <tr>
-                        <td class="rank">9</td>
+                        <td class="rank ">11</td>
                         <td>
-                            <div class="trader">
-                                <div class="avatar">CK</div>
-                                <span class="trader-name">CryptoKing_42</span>
-                            </div>
+                            <span class="trader-name blurred">████████████</span>
                         </td>
-                        <td class="win-rate win-high">76.2%</td>
-                        <td>22/29</td>
-                        <td class="pnl-positive">+$1,234</td>
-                        <td class="volume">$18,432</td>
+                        <td class="win-rate win-high">89.2%</td>
+                        <td>32/36</td>
+                        <td class="pnl-positive">+$8,732</td>
+                        <td class="volume">$74,413</td>
                     </tr>
-                    <tr>
-                        <td class="rank">10</td>
+
+                    <tr class="paywall-row">
+                        <td class="rank ">12</td>
                         <td>
-                            <div class="trader">
-                                <div class="avatar">PP</div>
-                                <span class="trader-name">PolymarketPro</span>
-                            </div>
+                            <span class="trader-name blurred">████████████</span>
                         </td>
-                        <td class="win-rate win-mid">74.8%</td>
+                        <td class="win-rate win-high">87.7%</td>
+                        <td>19/22</td>
+                        <td class="pnl-positive">+$6,196</td>
+                        <td class="volume">$86,136</td>
+                    </tr>
+
+                    <tr class="paywall-row">
+                        <td class="rank ">13</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-high">87.6%</td>
+                        <td>35/41</td>
+                        <td class="pnl-positive">+$8,078</td>
+                        <td class="volume">$30,509</td>
+                    </tr>
+
+                    <tr class="paywall-row">
+                        <td class="rank ">14</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-high">85.9%</td>
+                        <td>37/44</td>
+                        <td class="pnl-positive">+$15,882</td>
+                        <td class="volume">$80,167</td>
+                    </tr>
+
+                    <tr class="paywall-row">
+                        <td class="rank ">15</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-high">85.3%</td>
+                        <td>19/23</td>
+                        <td class="pnl-positive">+$7,712</td>
+                        <td class="volume">$69,125</td>
+                    </tr>
+
+                    <tr class="paywall-row">
+                        <td class="rank ">16</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-mid">77.8%</td>
                         <td>20/27</td>
-                        <td class="pnl-positive">+$987</td>
-                        <td class="volume">$15,876</td>
+                        <td class="pnl-positive">+$6,695</td>
+                        <td class="volume">$86,308</td>
                     </tr>
-                    <tr>
-                        <td class="rank">11</td>
+
+                    <tr class="paywall-row">
+                        <td class="rank ">17</td>
                         <td>
-                            <div class="trader">
-                                <div class="avatar">DW</div>
-                                <span class="trader-name">DeFiWhale</span>
-                            </div>
+                            <span class="trader-name blurred">████████████</span>
                         </td>
-                        <td class="win-rate win-mid">72.4%</td>
-                        <td>18/25</td>
-                        <td class="pnl-positive">+$756</td>
-                        <td class="volume">$12,345</td>
+                        <td class="win-rate win-mid">77.2%</td>
+                        <td>31/41</td>
+                        <td class="pnl-positive">+$4,956</td>
+                        <td class="volume">$38,006</td>
                     </tr>
-                    <tr>
-                        <td class="rank">12</td>
+
+                    <tr class="paywall-row">
+                        <td class="rank ">18</td>
                         <td>
-                            <div class="trader">
-                                <div class="avatar">BT</div>
-                                <span class="trader-name">BinaryTrader</span>
-                            </div>
+                            <span class="trader-name blurred">████████████</span>
                         </td>
-                        <td class="win-rate win-mid">71.2%</td>
-                        <td>17/24</td>
-                        <td class="pnl-positive">+$543</td>
-                        <td class="volume">$9,876</td>
+                        <td class="win-rate win-mid">75.5%</td>
+                        <td>16/22</td>
+                        <td class="pnl-positive">+$3,902</td>
+                        <td class="volume">$80,338</td>
+                    </tr>
+
+                    <tr class="paywall-row">
+                        <td class="rank ">19</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-mid">75.2%</td>
+                        <td>24/33</td>
+                        <td class="pnl-positive">+$8,871</td>
+                        <td class="volume">$61,986</td>
+                    </tr>
+
+                    <tr class="paywall-row">
+                        <td class="rank ">20</td>
+                        <td>
+                            <span class="trader-name blurred">████████████</span>
+                        </td>
+                        <td class="win-rate win-mid">75.1%</td>
+                        <td>15/20</td>
+                        <td class="pnl-positive">+$4,746</td>
+                        <td class="volume">$33,688</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <div class="cta-section">
-            <h2><span class="lock-icon">🔓</span> Unlock Full Leaderboard Access</h2>
+            <h2>🔓 Unlock Full Leaderboard Access</h2>
             <p>Get the complete guide + full trader names + bot setup instructions</p>
             <a href="https://buy.stripe.com/28EeVc4We23s8kBapW8so00" class="cta-button">Get the Guide - $65</a>
         </div>
