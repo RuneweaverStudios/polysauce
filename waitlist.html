@@ -321,7 +321,11 @@
     </div>
 
     <script>
-        // Simple waitlist submission (replace with actual backend)
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://nadhdcmswyxorbzrxser.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hZGhkY21zd3l4b3JienJ4c2VyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2ODQ1NzgsImV4cCI6MjA4ODI2MDU3OH0.dnVsU6S2HHa9zeEd3ICHpjiP42C9cKmkndsw7MB4nyY';
+
+        // Waitlist form submission
         document.getElementById('waitlistForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -329,41 +333,86 @@
             const submitBtn = document.getElementById('submitBtn');
             const successMessage = document.getElementById('successMessage');
 
+            // Validate email
+            if (!email || !email.includes('@')) {
+                alert('Please enter a valid email address');
+                return;
+            }
+
             // Disable button
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Joining...';
+            submitBtn.textContent = 'Adding to waitlist...';
 
-            // Simulate API call (replace with real endpoint)
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            try {
+                // Submit to Supabase
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        created_at: new Date().toISOString()
+                    })
+                });
 
-            // Store email locally (for demo)
-            const waitlist = JSON.parse(localStorage.getItem('waitlist') || '[]');
-            if (!waitlist.includes(email)) {
-                waitlist.push(email);
-                localStorage.setItem('waitlist', JSON.stringify(waitlist));
+                if (!response.ok) {
+                    const error = await response.json();
+                    if (error.code === '23505') {
+                        throw new Error('This email is already on the waitlist!');
+                    }
+                    throw new Error(error.message || 'Failed to join waitlist');
+                }
+
+                // Show success
+                successMessage.classList.add('show');
+                submitBtn.textContent = '✓ You\'re on the List!';
+                submitBtn.style.background = '#22c55e';
+
+                // Clear form
+                document.getElementById('email').value = '';
 
                 // Update counter
-                const count = parseInt(document.getElementById('waitlistCount').textContent) + 1;
-                document.getElementById('waitlistCount').textContent = count;
+                const countEl = document.getElementById('waitlistCount');
+                const currentCount = parseInt(countEl.textContent);
+                countEl.textContent = currentCount + 1;
+
+                // Track conversion
+                console.log('Waitlist signup:', email, new Date().toISOString());
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message || 'Error joining waitlist. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Join Waitlist — It\'s Free';
             }
-
-            // Show success
-            successMessage.classList.add('show');
-            submitBtn.textContent = '✓ You\'re on the List!';
-            submitBtn.style.background = '#22c55e';
-
-            // Track conversion (analytics)
-            console.log('Waitlist signup:', email);
         });
 
-        // Load waitlist count from storage
-        const stored = localStorage.getItem('waitlist');
-        if (stored) {
-            const count = JSON.parse(stored).length;
-            if (count > 0) {
-                document.getElementById('waitlistCount').textContent = 247 + count;
+        // Load waitlist count
+        async function loadWaitlistCount() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/waitlist?select=count`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Prefer': 'count=exact'
+                    }
+                });
+
+                if (response.ok) {
+                    const count = response.headers.get('content-range').split('/')[1];
+                    document.getElementById('waitlistCount').textContent = count || '1';
+                }
+            } catch (error) {
+                console.log('Could not load waitlist count');
             }
         }
+
+        // Load count on page load
+        loadWaitlistCount();
     </script>
 </body>
 </html>
