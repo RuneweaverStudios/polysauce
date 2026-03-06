@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polysauce Desktop App — Setup Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-body: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+    
+    /* Blueprint aesthetic - deep slate/blue palette */
+    --bg: #0f1419;
+    --surface: #1a2332;
+    --surface2: #232f3e;
+    --surface-elevated: #2a3a4d;
+    --border: rgba(255, 255, 255, 0.06);
+    --border-bright: rgba(255, 255, 255, 0.12);
+    --grid-line: rgba(255, 255, 255, 0.03);
+    --text: #e5e9f0;
+    --text-dim: #8b95a5;
+    --accent: #00d4ff;
+    --accent-dim: rgba(0, 212, 255, 0.1);
+    --accent-secondary: #7c3aed;
+    --accent-secondary-dim: rgba(124, 58, 237, 0.1);
+    --success: #10b981;
+    --success-dim: rgba(16, 185, 129, 0.1);
+    --warning: #f59e0b;
+    --warning-dim: rgba(245, 158, 11, 0.1);
+    --danger: #ef4444;
+    --danger-dim: rgba(239, 68, 68, 0.1);
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f0f4f8;
+      --surface: #ffffff;
+      --surface2: #f7fafc;
+      --surface-elevated: #ffffff;
+      --border: rgba(0, 0, 0, 0.08);
+      --border-bright: rgba(0, 0, 0, 0.15);
+      --grid-line: rgba(0, 0, 0, 0.04);
+      --text: #1a202c;
+      --text-dim: #718096;
+      --accent: #0891b2;
+      --accent-dim: rgba(8, 145, 178, 0.1);
+      --accent-secondary: #7c3aed;
+      --accent-secondary-dim: rgba(124, 58, 237, 0.1);
+      --success: #059669;
+      --success-dim: rgba(5, 150, 105, 0.1);
+      --warning: #d97706;
+      --warning-dim: rgba(217, 119, 6, 0.1);
+      --danger: #dc2626;
+      --danger-dim: rgba(220, 38, 38, 0.1);
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+      radial-gradient(ellipse at 50% 0%, var(--accent-dim) 0%, transparent 50%);
+    background-size: 24px 24px, 24px 24px, 100% 100%;
+    color: var(--text);
+    font-family: var(--font-body);
+    padding: 40px;
+    min-height: 100vh;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .section {
+    animation: fadeUp 0.6s ease-out both;
+    animation-delay: calc(var(--i, 0) * 0.1s);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+    }
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 60px;
+    animation: fadeIn 0.8s ease-out both;
+  }
+
+  h1 {
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 16px;
+    font-family: var(--font-mono);
+    margin-bottom: 24px;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--accent);
+  }
+
+  .step-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .step-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+  }
+
+  .step-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+
+  .step-number {
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid var(--accent);
+  }
+
+  .step-title {
+    flex: 1;
+  }
+
+  .step-title h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+
+  .step-title p {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .step-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .screenshot-container {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .screenshot-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .screenshot {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-bright);
+  }
+
+  .instructions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .instruction-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    gap: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .instruction-item:hover {
+    border-color: var(--border-bright);
+  }
+
+  .instruction-number {
+    background: var(--surface-elevated);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .instruction-text h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .instruction-text p {
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .warning-box {
+    background: var(--warning-dim);
+    border: 1px solid var(--warning);
+    border-left: 4px solid var(--warning);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 20px;
+  }
+
+  .warning-box h4 {
+    color: var(--warning);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .warning-box p {
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .success-box {
+    background: var(--success-dim);
+    border: 1px solid var(--success);
+    border-left: 4px solid var(--success);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 20px;
+  }
+
+  .success-box h4 {
+    color: var(--success);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .success-box p {
+    color: var(--text-dim);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .code-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    overflow-x: auto;
+    margin-top: 8px;
+  }
+
+  .metric-card {
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .metric-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .metric-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .cta-box {
+    background: linear-gradient(135deg, var(--accent-dim), var(--accent-secondary-dim));
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  .cta-box h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .cta-box p {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .cta-button {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
+  }
+
+  @media (max-width: 900px) {
+    .step-content {
+      grid-template-columns: 1fr;
+    }
+    
+    h1 {
+      font-size: 36px;
+    }
+    
+    .step-title h2 {
+      font-size: 24px;
+    }
+    
+    body {
+      padding: 20px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="badge">Setup Guide</div>
+    <h1>Polysauce Desktop App</h1>
+    <p class="subtitle">Copy successful traders on Polymarket with automated bot execution</p>
+  </header>
+
+  <!-- Step 1: Get API Credentials -->
+  <div class="step-section section" style="--i:0">
+    <div class="step-header">
+      <div class="step-number">01</div>
+      <div class="step-title">
+        <h2>Get Your Polymarket API Credentials</h2>
+        <p>Set up your builder account and generate API keys to connect the bot</p>
+      </div>
+    </div>
+    
+    <div class="step-content">
+      <div class="screenshot-container">
+        <div class="screenshot-label">Polymarket Settings Page</div>
+        <img src="setup1.jpg" alt="Polymarket settings dropdown menu" class="screenshot">
+      </div>
+      
+      <div class="instructions">
+        <div class="instruction-item">
+          <div class="instruction-number">1</div>
+          <div class="instruction-text">
+            <h3>Access Settings Menu</h3>
+            <p>Navigate to Polymarket and click your profile icon in the top right corner to open the dropdown menu.</p>
+          </div>
+        </div>
+        
+        <div class="instruction-item">
+          <div class="instruction-number">2</div>
+          <div class="instruction-text">
+            <h3>Go to Builder Settings</h3>
+            <p>Click on "Builders" from the menu to access your builder account settings.</p>
+          </div>
+        </div>
+        
+        <div class="instruction-item">
+          <div class="instruction-number">3</div>
+          <div class="instruction-text">
+            <h3>Copy Your Wallet Address</h3>
+            <p>Your wallet address appears at the top. This is your public identifier on Polymarket.</p>
+            <div class="code-block">0x7e9ef499ccf01ab3cc26fdf2add89cd6cc048e63</div>
+          </div>
+        </div>
+        
+        <div class="instruction-item">
+          <div class="instruction-number">4</div>
+          <div class="instruction-text">
+            <h3>Generate API Keys</h3>
+            <p>Click "+ Create New" to generate a new API key set. You'll receive an apiKey, secret, and passphrase.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="warning-box">
+      <h4>⚠️ Security Warning</h4>
+      <p><strong>Never share your private key or API credentials!</strong> These keys give full access to your Polymarket account. Store them securely and never commit them to git repositories or share them in chat.</p>
+    </div>
+  </div>
+
+  <!-- Step 2: View API Details -->
+  <div class="step-section section" style="--i:1">
+    <div class="step-header">
+      <div class="step-number">02</div>
+      <div class="step-title">
+        <h2>Save Your API Credentials</h2>
+        <p>Copy and securely store all three API components</p>
+      </div>
+    </div>
+    
+    <div class="step-content">
+      <div class="screenshot-container">
+        <div class="screenshot-label">API Details Modal</div>
+        <img src="setup3.jpg" alt="API details modal showing keys" class="screenshot">
+      </div>
+      
+      <div class="instructions">
+        <div class="instruction-item">
+          <div class="instruction-number">1</div>
+          <div class="instruction-text">
+            <h3>View API Details</h3>
+            <p>After creating keys, click "View Details" to see your credentials. This is the only time you'll see them!</p>
+          </div>
+        </div>
+        
+        <div class="instruction-item">
+          <div class="instruction-number">2</div>
+          <div class="instruction-text">
+            <h3>Copy All Three Keys</h3>
+            <p>You'll need to copy three separate values:</p>
+            <div class="code-block">
+              apiKey: 019cb697-24...<br>
+              secret: W1YVJbbPO1...<br>
+              passphrase: 7ed4f30175...
+            </div>
+          </div>
+        </div>
+        
+        <div class="instruction-item">
+          <div class="instruction-number">3</div>
+          <div class="instruction-text">
+            <h3>Store Securely</h3>
+            <p>Save these in a password manager or secure notes. You won't be able to view them again after closing this modal.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="warning-box">
+      <h4>⚠️ Important</h4>
+      <p>Polymarket may disable keys that are leaked or shared. If your keys are compromised, immediately generate new ones and delete the old set.</p>
+    </div>
+  </div>
+
+  <!-- Step 3: Choose a Wallet -->
+  <div class="step-section section" style="--i:2">
+    <div class="step-header">
+      <div class="step-number">03</div>
+      <div class="step-title">
+        <h2>Choose a Wallet to Copy</h2>
+        <p>Find successful traders on the leaderboard to follow</p>
+      </div>
+    </div>
+    
+    <div class="step-content">
+      <div class="screenshot-container">
+        <div class="screenshot-label">Builder Settings & Keys</div>
+        <img src="setup2.jpg" alt="Builder settings page with API keys" class="screenshot">
+      </div>
+      
+      <div class="instructions">
+        <div class="instruction-item">
+          <div class="instruction-number">1</div>
+          <div class="instruction-text">
+            <h3>Visit the Leaderboard</h3>
+            <p>Go to <strong>polysauce.xyz/leaderboard</strong> to see top performing traders ranked by performance metrics.</p>
+          </div>
+        </div>
+        
+        <div class="instruction-item">
+          <div class="instruction-number">2</div>
+          <div class="instruction-text">
+            <h3>Look for High Win Rates</h3>
+            <p>Prioritize traders with <strong>90%+ win rates</strong> and consistent performance over time.</p>
+          </div>
+        </div>
+        
+        <div class="instruction-item">
+          <div class="instruction-number">3</div>
+          <div class="instruction-text">
+            <h3>Check Volume & PnL</h3>
+            <p>Review their total volume traded and profit/loss to ensure they're actively trading profitably.</p>
+          </div>
+        </div>
+        
+        <div class="instruction-item">
+          <div class="instruction-number">4</div>
+          <div class="instruction-text">
+            <h3>Copy the Wallet Address</h3>
+            <p>Click on a trader to view their profile, then copy their wallet address to use in the bot.</p>
+            <div class="code-block">0x7e9ef499ccf01ab3cc26fdf2add89cd6cc048e63</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="success-box">
+      <h4>✓ Pro Tip</h4>
+      <p>Start with traders who have at least 50+ trades and 30+ days of track record. This shows consistent performance rather than lucky streaks.</p>
+    </div>
+  </div>
+
+  <!-- Step 4: Configure the App -->
+  <div class="step-section section" style="--i:3">
+    <div class="step-header">
+      <div class="step-number">04</div>
+      <div class="step-title">
+        <h2>Configure the Desktop App</h2>
+        <p>Enter your credentials and set up copy trading parameters</p>
+      </div>
+    </div>
+    
+    <div class="step-content">
+      <div class="screenshot-container">
+        <div class="screenshot-label">Portfolio & Activity Monitor</div>
+        <img src="setup4.jpg" alt="Polymarket portfolio showing active positions" class="screenshot">
+      </div>
+      
+      <div class="instructions">
+        <div class="instruction-item">
+          <div class="instruction-number">1</div>
+          <div class="instruction-text">
+            <h3>Enter Your API Credentials</h3>
+            <p>In the app settings, paste your apiKey, secret, and passphrase from Step 2.</p>
+          </div>
+        </div>
+        
+        <div class="instruction-item">
+          <div class="instruction-number">2</div>
+          <div class="instruction-text">
+            <h3>Add Target Wallet Address</h3>
+            <p>Paste the wallet address you want to copy from the leaderboard (Step 3).</p>
+          </div>
+        </div>
+        
+        <div class="instruction-item">
+          <div class="instruction-number">3</div>
+          <div class="instruction-text">
+            <h3>Set Risk Parameters</h3>
+            <p>Configure trade size limits, maximum position size, and stop-loss percentages to manage your risk.</p>
+          </div>
+        </div>
+        
+        <div class="instruction-item">
+          <div class="instruction-number">4</div>
+          <div class="instruction-text">
+            <h3>Start the Bot</h3>
+            <p>Click "Start" to begin monitoring the target wallet. The bot will automatically copy their trades in real-time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px;">
+      <div class="metric-card">
+        <div class="metric-value">90%+</div>
+        <div class="metric-label">Target Win Rate</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">5-10%</div>
+        <div class="metric-label">Per Trade Size</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">24/7</div>
+        <div class="metric-label">Active Monitoring</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 5: First Trade -->
+  <div class="step-section section" style="--i:4">
+    <div class="step-header">
+      <div class="step-number">05</div>
+      <div class="step-title">
+        <h2>Watch Your First Trade</h2>
+        <p>Monitor the bot as it copies trades in real-time</p>
+      </div>
+    </div>
+    
+    <div class="step-content">
+      <div class="instructions" style="grid-column: 1 / -1;">
+        <div class="instruction-item">
+          <div class="instruction-number">1</div>
+          <div class="instruction-text">
+            <h3>Activity Monitor</h3>
+            <p>Watch the activity monitor in the app to see when the target wallet makes a trade. You'll see real-time updates.</p>
+          </div>
+        </div>
+        
+        <div class="instruction-item">
+          <div class="instruction-number">2</div>
+          <div class="instruction-text">
+            <h3>Automatic Execution</h3>
+            <p>When the target places a trade, the bot automatically executes the same trade on your account within seconds.</p>
+          </div>
+        </div>
+        
+        <div class="instruction-item">
+          <div class="instruction-number">3</div>
+          <div class="instruction-text">
+            <h3>Track Performance</h3>
+            <p>Monitor your portfolio value and individual positions in the dashboard. Track PnL and win rate over time.</p>
+          </div>
+        </div>
+        
+        <div class="instruction-item">
+          <div class="instruction-number">4</div>
+          <div class="instruction-text">
+            <h3>Adjust Settings</h3>
+            <p>Fine-tune your risk parameters based on performance. You can pause copying at any time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="success-box">
+      <h4>🎉 You're All Set!</h4>
+      <p>The bot is now actively monitoring your target wallet and will copy their trades automatically. Check back regularly to monitor performance and adjust settings as needed.</p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box section" style="--i:5">
+    <h3>Ready to Start Copy Trading?</h3>
+    <p>Join thousands of traders automating their Polymarket strategies with Polysauce</p>
+    <a href="https://polysauce.xyz" class="cta-button">Visit polysauce.xyz →</a>
+  </div>
+</div>
+
+</body>
+</html>

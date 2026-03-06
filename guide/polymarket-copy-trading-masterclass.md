@@ -10,6 +10,45 @@ This guide will teach you how to build a bot that automatically copies the best 
 
 ---
 
+## ⚠️ CRITICAL: Use a Burner Wallet
+
+**NEVER use your main Polymarket wallet for this bot.**
+
+### Why This Matters
+
+Fully automated trading requires giving the bot your private key. This is non-negotiable — the bot needs to sign trades without you clicking "Approve" every time.
+
+**The solution:** Create a dedicated "burner" wallet just for the bot.
+
+### How to Create a Burner Wallet
+
+**Phantom:**
+1. Settings → Add Account → Create New Wallet
+2. Name it "Polymarket Bot" 
+3. Fund it with only $50-100 (what you can afford to lose)
+
+**Metamask:**
+1. Click account icon → Create Account
+2. Name it "Polymarket Bot"
+3. Fund it with only $50-100
+
+### Why Private Key is Necessary
+
+You might wonder: "Why can't I just log in with my wallet like on the Polymarket website?"
+
+**Answer:** Automation requires autonomy.
+
+| Method | Requires You Present | Trades 24/7 | Set-and-Forget |
+|--------|---------------------|-------------|----------------|
+| Wallet Connect | ✅ Yes - click every time | ❌ No | ❌ No |
+| Private Key | ❌ No - fully autonomous | ✅ Yes | ✅ Yes |
+
+When you give your bot the private key, it can trade while you sleep, work, study, or do literally anything else. That's the entire point.
+
+**Security best practice:** A burner wallet with limited funds means limited risk. If anything goes wrong, you only lose what's in that wallet — your main portfolio stays safe.
+
+---
+
 ## Table of Contents
 
 - [Quick Start (30 Minutes)](#quick-start)
